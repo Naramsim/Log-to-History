@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 import re
-from collections import defaultdict
-import json
 '''
 index:
-0 ip
+0 import
 1 datetime
 2 file requested
 3 referrer
@@ -16,18 +14,6 @@ def process_log(log):
     entry = get_entry(requests, 0) #feature selected
     totals = file_occur(entry)
     return totals
-
-def get_user_story(log):
-    requests = get_requests(log)
-    story = defaultdict(list) #dict of array/list of dicts
-    for req in requests:
-        elements = {}
-        elements["datetime"]=req[1]
-        elements["file_requested"]=req[2]
-        elements["referrer"]=req[3]
-        # we can put User-Agent for checking if it is the same person to use this IP (maybe there could be a NAT)
-        story[req[0]].append(elements)
-    print json.dumps( story, sort_keys=False, indent=4)
 
 def get_requests(f):
     log_line = f.read()
@@ -57,9 +43,6 @@ def get_entry(requests,index):
         requested_entries.append(req[index])
     return requested_entries #select only one feature from all, index is the feature we want
 
-
-    
-
 def file_occur(entry):
     #number of occurrences over requested entry with related entry
     d = {}
@@ -73,4 +56,4 @@ if __name__ == '__main__':
     log_file = open('/var/log/nginx/access.log', 'r')
 
     #return dict of entry and total requests
-    get_user_story(log_file)
+    print(process_log(log_file))
