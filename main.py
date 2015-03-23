@@ -7,8 +7,10 @@ index:
 0 ip
 1 datetime
 2 file requested
-3 referrer
-4 User-Agent
+3 status
+4 size of response in bytes
+5 referrer
+6 User-Agent
 '''
 
 def process_log(log):
@@ -24,21 +26,25 @@ def get_user_story(log):
         elements = {}
         elements["datetime"]=req[1]
         elements["file_requested"]=req[2]
-        elements["referrer"]=req[3]
-        # we can put User-Agent for checking if it is the same person to use this IP (maybe there could be a NAT)
+        elements["referrer"]=req[5]
+        elements["size"]=req[4]
+        elements["UA"]=req[6] # we can put User-Agent for checking if it is the same person to use this IP (maybe there could be a NAT)
         story[req[0]].append(elements)
     print json.dumps( story, sort_keys=False, indent=4)
 
 def get_requests(f):
     log_line = f.read()
     pat = (r''
-           '(\d+.\d+.\d+.\d+)\s-\s-\s' #IP address
-           '\[(.+)\]\s' #datetime
-           '"GET\s(.+)\s\w+/.+"\s\d+\s' #requested file
-           '\d+\s"(.+)"\s' #referrer
-           '"(.+)"' #user agent
+            '(\d+.\d+.\d+.\d+)\s-\s-\s' #IP address
+            '\[(.+)\]\s' #datetime
+            '"GET\s(.+)\s\w+/.+"\s' #requested file
+            '(\d+)\s' #status
+            '(\d+)\s' #bandwidth
+            '"(.+)"\s' #referrer
+            '"(.+)"' #user agent
         )
     requests = find(pat, log_line, None)
+    #print requests
     return requests #array of all access log lines
 
 def find(pat, text, match_item):
@@ -70,7 +76,7 @@ def file_occur(entry):
 if __name__ == '__main__':
 
     #nginx access log, standard format
-    log_file = open('/var/log/nginx/access.log', 'r')
+    log_file = open('access.log', 'r')
 
     #return dict of entry and total requests
     get_user_story(log_file)
