@@ -30,7 +30,7 @@ def get_user_story(log):
         elements["size"]=req[4]
         elements["UA"]=req[6] # we can put User-Agent for checking if it is the same person to use this IP (maybe there could be a NAT)
         story[req[0]].append(elements)
-    print json.dumps( story, sort_keys=False, indent=4)
+    return json.dumps( story, sort_keys=False)
 
 def get_requests(f):
     log_line = f.read()
@@ -63,9 +63,6 @@ def get_entry(requests,index):
         requested_entries.append(req[index])
     return requested_entries #select only one feature from all, index is the feature we want
 
-
-    
-
 def file_occur(entry):
     #number of occurrences over requested entry with related entry
     d = {}
@@ -79,4 +76,4 @@ if __name__ == '__main__':
     log_file = open('access.log', 'r')
 
     #return dict of entry and total requests
-    get_user_story(log_file)
+    print get_user_story(log_file)
