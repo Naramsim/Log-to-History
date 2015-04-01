@@ -23,7 +23,8 @@ def get_user_story(log):
     try:
         IPs = [] # list of processed IPs
         IP_index = 0 # unuseful
-
+        my_site = "://atletica.me"
+        filters = [".php",".htlm",".htm"]
         requests = get_requests(log) #list with all lines of the access log
         story = {} #dict of array/list of dicts
         story["name"] = "root_log" # root of the three
@@ -37,24 +38,30 @@ def get_user_story(log):
             elements["UA"]=req[6] # we can put User-Agent for checking if it is the same person to use this IP (maybe there could be a NAT)
             #story[req[0]].append(elements)
 
-            # IF IP ALREADY PROCESSED ONCE
-            if req[0] in IPs:
-                IP_index_list = [n for n,el in enumerate(story["children"]) if el["name"] == req[0]] # if is a filter # l is a one-value list
-                IP_index = IP_index_list[0]
-            # IF IP IS NEW
-            else:
-                IPs.append(req[0])
-                ip_dict = {}
-                ip_dict["name"] = req[0]
-                ip_dict["children"] = []
-                ip_dict["count"] = 0
-                story["children"].append(ip_dict)
-                IP_index = len(story["children"])-1
+            if ( any(x in req[2] for x in filters) or (req[2].endswith('/')) or (('.') not in req[2]) ): #if page requested is contained in filters or it is a folder
+            	IP_index_list = [n for n,el in enumerate(story["children"]) if el["name"] == req[0]]  # IP_index_list is a one-value list, it contains the index of the IP that we are processing
+                # IF IP ALREADY PROCESSED ONCE
+                if req[0] in IPs:
+                    IP_index = IP_index_list[0]
+                # IF IP IS NEW
+                else:
+                    IPs.append(req[0]) #now it is no more a new IP
+                    ip_dict = {}
+                    ip_dict["name"] = req[0]
+                    ip_dict["children"] = []
+                    ip_dict["count"] = 0
+                    story["children"].append(ip_dict)
+                    IP_index = len(story["children"])-1
 
-            story["children"][IP_index]["count"] += 1
+                story["children"][IP_index]["count"] += 1
 
-            if req[5] == "-":   # if referrer is not defined
-                story["children"][IP_index]["children"].append({"name":req[2], "ref":req[5]}) #, "children":[]
+                if my_site not in req[5] :   # if referrer is not defined or come from another site, I create a new first-level node
+                    story["children"][IP_index]["children"].append({"name":req[2], "ref":req[5], "children":[], "datetime":req[1]}) #, "children":[]
+                else:	#if not, i try to chain it
+                	ref_index_list = [n for n,el in enumerate(story["children"][IP_index]["children"]) if el["name"] in req[5]] #the referrer contains the full URL
+                	if ref_index_list:
+	                	ref_index = ref_index_list[-1] #last element #TODO check between the two datetime
+	                	story["children"][IP_index]["children"][ref_index]["children"].append({"name":req[2], "ref":req[5], "datetime":req[1]})
     
     except Exception as ex:
         print( "[" + str(format( sys.exc_info()[-1].tb_lineno )) + "]: " + str(ex) ) # error line and exception
@@ -103,7 +110,7 @@ def file_occur(entry):
 if __name__ == '__main__':
 
     #nginx access log, standard format
-    log_file = open('access.log', 'r')
+    log_file = open('atletica2.log', 'r')
 
     #return dict of entry and total requests
     ret = get_user_story(log_file)
@@ -111,3 +118,9 @@ if __name__ == '__main__':
     file_ = open('accesslog.json', 'w')
     file_.write(ret)
     file_.close()
+
+
+'''
+COMMENTS:
+every line of log that have a referrer pointing at your site, but it has no father, is omitted
+'''
