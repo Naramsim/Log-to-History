@@ -58,16 +58,26 @@ def get_user_story(log):
                 if my_site not in req[5] :   # if referrer is not defined or come from another site, I create a new first-level node
                     story["children"][IP_index]["children"].append({"name":req[2], "ref":req[5], "children":[], "datetime":req[1]}) #, "children":[]
                 else:	#if not, i try to chain it
-                	ref_index_list = [n for n,el in enumerate(story["children"][IP_index]["children"]) if el["name"] in req[5]] #the referrer contains the full URL
-                	if ref_index_list:
-	                	ref_index = ref_index_list[-1] #last element #TODO check between the two datetime
-	                	story["children"][IP_index]["children"][ref_index]["children"].append({"name":req[2], "ref":req[5], "datetime":req[1]})
+                	attach_node( story["children"][IP_index]["children"], req )
     
     except Exception as ex:
-        print( "[" + str(format( sys.exc_info()[-1].tb_lineno )) + "]: " + str(ex) ) # error line and exception
+        print( "[" + str(format( sys.exc_info()[-1].tb_lineno )) + "]: " + str(ex) )    # error line and exception
         exit(1)
 
     return json.dumps( story, sort_keys=False)
+
+def attach_node(current_node, req):
+    if not current_node:
+        return False
+    ref_index_list = [n for n,el in enumerate(current_node) if el["name"] in req[5]]    #the referrer contains the full URL
+    if ref_index_list:
+        ref_index = ref_index_list[-1]  #last element #TODO check between the two datetime
+        #story["children"][IP_index]["children"][ref_index]["children"].append({"name":req[2], "ref":req[5], "datetime":req[1]})
+        current_node[ref_index]["children"].append({"name":req[2], "ref":req[5], "datetime":req[1], "children":[]})
+    elif not ref_index_list: #if we have not found the referrer maybe it is in a son
+        for element in current_node:    #for every son, do:
+            attach_node(element["children"] , req)
+
 
 def get_requests(f):
     log_line = f.read()

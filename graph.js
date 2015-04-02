@@ -1,7 +1,7 @@
 function prepare_graph(){
   var margin = {top: 20, right: 120, bottom: 20, left: 120},
-      width = 960 - margin.right - margin.left,
-      height = 800 - margin.top - margin.bottom;
+      width = 1360 - margin.right - margin.left,
+      height = 1000 - margin.top - margin.bottom;
       
   var i = 0,
       duration = 750,
