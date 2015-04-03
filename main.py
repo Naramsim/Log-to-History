@@ -13,6 +13,9 @@ index:
 6 User-Agent
 '''
 
+my_site = "://atletica.me"
+protocol = "http"
+
 def process_log(log):
     requests = get_requests(log) #all lines of access log, to get first line: print requests[0]
     entry = get_entry(requests, 0) #feature selected
@@ -24,6 +27,7 @@ def get_user_story(log):
         IPs = [] # list of processed IPs
         IP_index = 0 # unuseful
         my_site = "://atletica.me"
+        protocol = "http"
         filters = [".php",".htlm",".htm"]
         requests = get_requests(log) #list with all lines of the access log
         story = {} #dict of array/list of dicts
@@ -69,7 +73,7 @@ def get_user_story(log):
 def attach_node(current_node, req):
     if not current_node:
         return False
-    ref_index_list = [n for n,el in enumerate(current_node) if el["name"] in req[5]]    #the referrer contains the full URL
+    ref_index_list = [n for n,el in enumerate(current_node) if (protocol+my_site+el["name"]) == req[5]]    #the referrer contains the full URL
     if ref_index_list:
         ref_index = ref_index_list[-1]  #last element #TODO check between the two datetime
         #story["children"][IP_index]["children"][ref_index]["children"].append({"name":req[2], "ref":req[5], "datetime":req[1]})
