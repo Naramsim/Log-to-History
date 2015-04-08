@@ -59,12 +59,16 @@ function prepare_graph(){
 
     nodeEnter.append("circle")
         .attr("r", 1e-6)
-        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+        .style("fill", function(d) { 
+        	return d._children ? "lightsteelblue" : "#fff"; 
+        });
 
     nodeEnter.append("text")
-        .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+        .attr("x", function(d) { return has_child(d) ? 10 : -10; })
         .attr("dy", ".35em")
-        .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+        .attr("text-anchor", function(d) {
+        	return has_child(d) ? "start" : "end";
+        })
         .text(function(d) { return d.name; })
         .style("fill-opacity", 1e-6);
 
@@ -75,7 +79,14 @@ function prepare_graph(){
 
     nodeUpdate.select("circle")
         .attr("r", 4.5)
-        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+        .style("fill", function(d) { 
+        	if (d._children == null || d._children === undefined || d._children.length < 1)
+				return "#fff";
+			if (d.is_bot)
+				return "#F9DC69";
+			return "lightsteelblue";
+			
+        });
 
     nodeUpdate.select("text")
         .style("fill-opacity", 1);
@@ -127,6 +138,7 @@ function prepare_graph(){
 
   // Toggle children on click.
   function click(d) {
+  	//console.log(d)
     if (d.children) {
       d._children = d.children;
       d.children = null;
@@ -135,5 +147,9 @@ function prepare_graph(){
       d._children = null;
     }
     update(d);
+  }
+
+  function has_child(d) {
+  	return (d.children == null || d.children.length < 1 || d.children===undefined) && (d._children == null || d._children.length < 1 || d._children===undefined);
   }
 }
