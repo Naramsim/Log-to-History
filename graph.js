@@ -13,11 +13,22 @@ function prepare_graph(){
   var diagonal = d3.svg.diagonal()
       .projection(function(d) { return [d.y, d.x]; });
 
+  var tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 0])
+    .html(function(d) {
+      if(d.UA)
+        return " <span style='color:lightsteelblue'>" + d.UA +" "+ d.datetime + "</span>";
+      return " <span style='color:lightsteelblue'>" + d.datetime + "</span>";
+    })
+
   var svg = d3.select("body").append("svg")
       .attr("width", width + margin.right + margin.left)
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  svg.call(tip);
 
   d3.json("accesslog.json", function(error, flare) {
     root = flare;
@@ -57,6 +68,7 @@ function prepare_graph(){
         .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
         .on("click", click);
 
+
     nodeEnter.append("circle")
         .attr("r", 1e-6)
         .style("fill", function(d) { 
@@ -70,7 +82,12 @@ function prepare_graph(){
         	return has_child(d) ? "start" : "end";
         })
         .text(function(d) { return d.name; })
-        .style("fill-opacity", 1e-6);
+        .style("fill-opacity", 1e-6)
+        .style("font-size", function(d) {
+        	return (d.name.length > 20) ? "10px" : "14px";
+        })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 
     // Transition nodes to their new position.
     var nodeUpdate = node.transition()
@@ -138,7 +155,7 @@ function prepare_graph(){
 
   // Toggle children on click.
   function click(d) {
-  	//console.log(d)
+  	console.log(d)
     if (d.children) {
       d._children = d.children;
       d.children = null;

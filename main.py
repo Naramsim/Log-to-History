@@ -52,8 +52,11 @@ def get_user_story(log):
                     IPs.append(req[0]) #now it is no more a new IP
                     ip_dict = {}
                     ip_dict["name"] = req[0]
+                    ip_dict["UA"] = req[6]
+                    ip_dict["datetime"] = req[1]
                     ip_dict["children"] = []
                     ip_dict["count"] = 0
+                    ip_dict["is_bot"] = check_bot(req)
                     story["children"].append(ip_dict)
                     IP_index = len(story["children"])-1
 
@@ -81,6 +84,15 @@ def attach_node(current_node, req):
     elif not ref_index_list: #if we have not found the referrer maybe it is in a son
         for element in current_node:    #for every son, do:
             attach_node(element["children"] , req)
+
+
+def check_bot(request):
+	if("robot.txt" in request[0]):
+		return True
+	bots = ["bot","crawl","spider"]
+	if any(bot in request[6] for bot in bots):
+		return True
+	return False
 
 
 def get_requests(f):
