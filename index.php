@@ -8,6 +8,10 @@
 	<script src="https://mtgfiddle.me/tirocinio/pezze/d3tip.js" type="text/javascript"></script>
 	<script src="graph.js" type="text/javascript"></script>
 	<style>
+		body {
+			font: 10px "Open Sans";
+		}
+
 		.node {
 		  cursor: pointer;
 		}
@@ -76,6 +80,60 @@
 		  top: 100%;
 		  left: 0;
 		}
+
+
+
+		.axis path,
+		.axis line, 
+		.axis1 path,
+		.axis1 line {
+		  fill: none;
+		  stroke: #E6E7E8;
+		  shape-rendering: crispEdges;
+		}
+
+		.x.axis path, .x.axis1 path {
+		  display: none;
+		}
+
+		.line {
+		  fill: none;
+		  stroke-width: 1.5px;
+		}
+
+		.legend-box {
+		  cursor: pointer;  
+		}
+
+		#mouse-tracker {
+		  stroke: #E6E7E8;
+		  stroke-width: 1px;
+		}
+
+		.hover-line { 
+		  stroke: #E6E7E8;
+		  fill: none;
+		  stroke-width: 1px;
+		  left: 10px;
+		  shape-rendering: crispEdges;
+		  opacity: 1e-6;
+		}
+
+		.hover-text {
+		  stroke: none;
+		  font-size: 30px;
+		  font-weight: bold;
+		  fill: #000000;
+		}
+
+		.tooltip {
+		  font-weight: normal;
+		}
+
+		.brush .extent {
+		  stroke: #FFF;
+		  shape-rendering: crispEdges;
+		}
 	</style>
 </head>
 
@@ -89,11 +147,12 @@
 <body>
 	
 	<script type="text/javascript">
-		prepare_graph()
+		prepare_graph();
+		//prepare_chart();
 	</script>
 
 	<?
-		echo "<pre>".$json_string."</pre>";
+		//echo "<pre>".$json_string."</pre>";
 	?>
 	
 </body>
