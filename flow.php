@@ -11,13 +11,12 @@
   $json_string = json_encode($output1, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 ?>
 <body>
-	<div id="summary">A frenzy of realignment has transformed college athletics:
-    about one in four major</div>
+	<div id="summary">blablabla</div>
     <div id="graphic-and-annotations">
         <div id="search"></div>
         <div id="graphic-title-and-subtitle">
-            <div id="graphic-title">Major college football programs since 1965</div>
-            <div id="graphic-subtitle">Schools switching conferences are highlighted</div>
+            <div id="graphic-title">User History since one hour ago</div>
+            <div id="graphic-subtitle">IP switching pages are highlighted as:</div>
         </div>
         <!-- <div id="annotations"></div> -->
         <div id="graphic"></div>
@@ -36,23 +35,43 @@
         }
     }
 
-    var regInteger = /^\d+$/;
+    var regInteger = /^\d+$/, t = [], a = [], r = 3500, o = 6000, n = d3.map();
 
     function isInteger( str ) {    
         return regInteger.test( str );
     }
 
-    function findClosest(arr, id) {
-        for(var i=id ; i>=0 && i<=6000; i=i-1)
-            //console.log(arr[i])
-            if( arr[i] )
-                return arr[i];
-        //return false;
+    function findClosest(arr, id, increasing) {
+        var step = increasing ? 1 : -1;
+        var i=+id+step;
+        if( arr[id]!="" && arr[id]!==undefined ){
+            for(; i>=0 && i<=o; i+=step){
+                if( arr[i] && arr[i]!=""){
+                    return i;
+                }
+            }
+        }
+        return false; 
     }
 
-    var t = [], a = [], r = 3500, o = 6000, n = d3.map();
-
     d3.tsv("story.tsv", function(e, data) {
+        data.forEach(function(entry) {
+            for (var key in entry) {
+                if (entry[key]!="" ||entry[key]!==undefined){
+                    previous_item = findClosest(entry,key,false);
+                    next_item = findClosest(entry,key,true);
+                    if (previous_item && next_item){
+                        previous_item = previous_item + 1;
+                        next_item = next_item - 1; //TODO:check if previous or next is the same page
+                        if ( !(previous_item in entry) || entry[previous_item]=="" || entry[previous_item]===undefined)
+                            entry[previous_item] = entry[key];
+
+                        if ( !(next_item in entry) || entry[next_item]=="" || entry[next_item]===undefined)
+                            entry[next_item] = entry[key];
+                    }
+                }
+            }
+        });
         var pages = new Set(); //store all folder requested
         var last_req = new Array(); //store all IP, and their last folder request
         data.forEach(function(entry) {            
@@ -91,28 +110,15 @@
             a_element.index = index;
             a.push(a_element);
         });
-        console.log(data[26]);
-        data.forEach(function(entry) {
-            for (var key in entry) {
-                if( entry[key] == "" ){
-                    previous_item = findClosest(entry,key)
-                    //console.log("\"\" ="+key +" prev="+previous_item)
-                    if( previous_item ){
-                        entry[key] = previous_item;
-                    }
-                }
-                
-            }
-        });
-        console.log(data[26]);
         n = d3.map();
         t.forEach(function(e, t) {
             e.index = t, n.set(e.id, e)
         });
-        draw();
+        draw(data);
     });
     
-    function draw() {
+    function draw(t) {
+        var data = t
         var margins = {top: 40.5,right: 35.5,bottom: 40.5,left: 65.5}, 
             i = 4230 - margins.left - margins.right,
             s = 1096 - margins.top - margins.bottom, 
@@ -130,7 +136,8 @@
         }), p.append("g").attr("class", "axis axis--major").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(l).orient("right").tickValues(l.ticks(d3.time.year, 100).concat(l.domain()))), p.append("g").attr("class", "axis axis--major").call(d3.svg.axis().scale(l).orient("left").tickValues(l.ticks(d3.time.year, 50).concat(l.domain())));
         var u = d3.select("#overlay").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")"), h = d3.select("#graphic-subtitle").append("svg").style("position", "absolute").style("margin-top", "-5px").attr("height", 30).attr("width", 30), f = h.append("g").attr("class", "school school--switch"), y = f.append("linearGradient").attr("id", "school-switch-gradient-key").attr("y1", "100%").attr("y2", "0%").attr("x1", 0).attr("x2", 0);
         y.append("stop").attr("offset", "0%").attr("stop-color", "#d7d7d7"), y.append("stop").attr("offset", "100%").attr("stop-color", "purple"), f.append("path").attr("d", "M" + e(1)([[10, 22], [20, 8]])).style("stroke", "url(#school-switch-gradient-key)"), 
-        d3.tsv("story.tsv", function(e, t) {
+        !function(t) {
+            //console.log(t)
             function h(e) { //hover
                 if (e) {
                     f(e.school.name);
@@ -220,12 +227,12 @@
                 }), w += e.maxSize + v
             }), d3.select("#search").on("click", function() {
                 d3.event.stopPropagation()
-            }).append("select").attr("class", "search-select").attr("data-placeholder", "Select a team to highlight.").attr("tabindex", 2).selectAll("option").data([{name: "",team: ""}].concat(t.sort(function(e, t) {
+            }).append("select").attr("class", "search-select").attr("data-placeholder", "Select a IP to highlight.").attr("tabindex", 2).selectAll("option").data([{name: "",team: ""}].concat(t.sort(function(e, t) {
                 return d3.ascending(e.name, t.name)
             }))).enter().append("option").attr("value", function(e) {
                 return e.name
             }).text(function(e) {
-                return e.name + " " + e.team
+                return e.name// + " " + e.team
             }), $(".search-select").chosen({width: "100%",allow_single_deselect: !0}).change(
             function() {
                 y(this.value)
@@ -265,21 +272,22 @@
                     return {word: a,offset: "top" === e.orient ? n - t.length : n + 1.71}
                 })
             }).attr("transform", function(e) {
-
-                var t = Math.max(0, Math.min(i, l(new Date(e.year,0,1)))),
-                    a = x.filter(function(t) {
-                            return t.key === e.id
-                        })[0].values.filter(function(t) {
-                            return t.key == e.year
-                        })[0].values;
+                
+                var t = Math.max(0, Math.min(i, l(new Date(e.year,0,1)))), a = x.filter(function(t) {
+                    return t.key === e.id
+                })[0].values.filter(function(t) {
+                    return t.key == e.year
+                })[0].values;
                 return a = (a[0].y + a[a.length - 1].y) / 2, "translate(" + c(a) + "," + t + ")"
             }).selectAll("tspan").data(function(e) {
+
                 return e.labelWords
             }).enter().append("tspan").attr("x", 0).attr("y", function(e) {
                 return 1.1 * e.offset + "em"
             }).text(function(e) {
                 return e.word
             }), p.append("line").attr("class", "annotation-line").attr("x1", 865).attr("y1", 25).attr("x2", 890).attr("y2", 25), p.append("line").attr("class", "annotation-line").attr("x1", 855).attr("y1", 428).attr("x2", 975).attr("y2", 428), p.append("line").attr("class", "annotation-line").attr("x1", 185).attr("y1", 1320).attr("x2", 185).attr("y2", 1370);
+            
             var B = u.append("g").attr("class", "tooltip").style("display", "none"), j = B.append("path"), M = B.append("text").attr("dy", ".35em").attr("x", 10);
             u.append("g").attr("class", "voronoi").selectAll("path").data(d3.geom.voronoi().y(function(e) {
                 return l(e.date)
@@ -298,7 +306,7 @@
             }), d3.select(window).on("click", function() {
                 y(null)
             })
-        })
+        }(data);
     }
 }(window);
 </script>
