@@ -56,8 +56,12 @@
 
     d3.tsv("story.tsv", function(e, data) {
         data.forEach(function(entry) {
+        	var keys = [];
+        	var entries = [];
             for (var key in entry) {
-                if (entry[key]!="" ||entry[key]!==undefined){
+                if (entry[key]!="" && entry[key]!==undefined && isInteger(key) ){
+                	keys.push(key)
+                	entries.push(entry[key])
                     previous_item = findClosest(entry,key,false);
                     next_item = findClosest(entry,key,true);
                     if (previous_item && next_item){
@@ -70,6 +74,9 @@
                             entry[next_item] = entry[key];
                     }
                 }
+            }
+            if(keys.length == 2){
+            	entry[keys[1]-1] = entries[0]
             }
         });
         var pages = new Set(); //store all folder requested
@@ -137,7 +144,7 @@
         var u = d3.select("#overlay").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")"), h = d3.select("#graphic-subtitle").append("svg").style("position", "absolute").style("margin-top", "-5px").attr("height", 30).attr("width", 30), f = h.append("g").attr("class", "school school--switch"), y = f.append("linearGradient").attr("id", "school-switch-gradient-key").attr("y1", "100%").attr("y2", "0%").attr("x1", 0).attr("x2", 0);
         y.append("stop").attr("offset", "0%").attr("stop-color", "#d7d7d7"), y.append("stop").attr("offset", "100%").attr("stop-color", "purple"), f.append("path").attr("d", "M" + e(1)([[10, 22], [20, 8]])).style("stroke", "url(#school-switch-gradient-key)"), 
         !function(t) {
-            //console.log(t)
+            console.log(t)
             function h(e) { //hover
                 if (e) {
                     f(e.school.name);
@@ -154,13 +161,35 @@
                 })
             }
             function y(e) {
-                d3.selectAll(".school--switch-selected").classed("school--switch-selected", !1).select("stop:first-child").attr("stop-color", "#d7d7d7"), C.classed("school--session-selected", function(t) {
+
+                d3.selectAll(".school--switch-selected").classed("school--switch-selected", !1).select("stop:first-child").attr("stop-color", "#d7d7d7")
+
+                C.classed("school--session-selected", function(t) {
                     return t[0].school.name === e
-                }), A.filter(function(t) {
+                })
+
+                var AA = A.filter(function(t) {
                     return t[0].school.name === e
                 }).each(function() {
                     this.parentNode.appendChild(this)
-                }).classed("school--switch-selected", !0).select("stop:first-child").attr("stop-color", "orange"), $(".search-select").val(e).trigger("chosen:updated")
+                }).classed("school--switch-selected", !0).select("stop:first-child").attr("stop-color", "orange")
+
+                $(".search-select").val(e).trigger("chosen:updated")
+
+                var scrollable = d3.select("body"); 
+                console.log(AA[0][AA[0].length -1]["__data__"][0]["year"])
+			    var scrollheight = 600 //scrollable.property("scrollHeight"); 
+
+			    scrollable.transition().duration(3000).
+			        tween("scroll", scrollTopTween(scrollheight))
+				
+
+				function scrollTopTween(scrollTop) { 
+				    return function() { 
+				        var i = d3.interpolateNumber(this.scrollTop, scrollTop); 
+				        return function(t) { this.scrollTop = i(t); }; 
+				    }; 
+				} 
             }
             var g = [], m = [], b = [];
             t = t.filter(function(e) {
@@ -235,6 +264,7 @@
                 return e.name// + " " + e.team
             }), $(".search-select").chosen({width: "100%",allow_single_deselect: !0}).change(
             function() {
+            	console.log(this)
                 y(this.value)
             }), p.append("g").attr("class", "school school--session-halo").selectAll("path").data(m).enter().append("path").attr("d", d);
             var C = p.append("g").attr("class", "school school--session").selectAll("path").data(m).enter().append("path").attr("d", d).classed("school--session-partial", function(e) {
