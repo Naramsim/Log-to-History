@@ -5,10 +5,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" type="text/javascript"></script>
 
 <?php 
-  ob_start();
+  /*ob_start();
   system("./main.py", $status);
   $output1 = json_decode( ob_get_clean() , true);
-  $json_string = json_encode($output1, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+  $json_string = json_encode($output1, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);*/
 ?>
 <body>
 	<div id="summary">blablabla</div>
@@ -35,7 +35,7 @@
         }
     }
 
-    var regInteger = /^\d+$/, t = [], a = [], r = 3500, o = 6000, n = d3.map();
+    var regInteger = /^\d+$/, t = [], a = [], r = 0, o = 3600, n = d3.map();
 
     function isInteger( str ) {    
         return regInteger.test( str );
@@ -125,11 +125,32 @@
     });
     
     function draw(t) {
-        var data = t
+    	var year1 = new Date('January 01, 1995 00:00:00'); year1.setFullYear(1);
+
+    	var formatCount = d3.format(",.0f"),
+        formatTime = d3.time.format("%Mm %Ss"),
+        formatMinutes = function(d) { 
+            var hours = Math.floor(d / 3600),
+                minutes = Math.floor((d - (hours * 3600)) / 60),
+                seconds = d - (minutes * 60);
+            var output = seconds + 's';
+            if (minutes) {
+                output = minutes + 'm ' + output;
+            }
+            if (hours) {
+                output = hours + 'h ' + output;
+            }
+            return output;
+        };
+        
+
+    	l_hours = d3.time.scale().domain([year1, new Date(o, 0, 1)]).range([i, 0]);
+        var data = t;
         var margins = {top: 40.5,right: 35.5,bottom: 40.5,left: 65.5}, 
-            i = 4230 - margins.left - margins.right,
+            i = 8230 - margins.left - margins.right,
             s = 1096 - margins.top - margins.bottom, 
-            l = d3.time.scale().domain([new Date(r, 0, 1), new Date(o, 0, 1)]).range([i, 0]), 
+            l = d3.time.scale().domain([year1, new Date(o, 0, 1)]).range([i, 0]), 
+            x_domain = d3.scale.linear().domain([0, 3600]).range([i, 0]),
             c = d3.scale.linear().rangeRound([20, s]), 
             d = d3.svg.line().interpolate(e(4.5)).defined(function(e) {
             return e.conference
@@ -140,7 +161,7 @@
         }), p = d3.select("#graphic").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")");
         /* draw horizontal lines */p.append("defs").append("marker").attr("id", "arrowhead").attr("viewBox", "-.1 -5 10 10").attr("orient", "auto").attr("markerWidth", 3).attr("markerHeight", 3).append("path").attr("d", "M-.1,-4L3.9,0L-.1,4"), p.append("g").attr("class", "axis axis--minor").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(l).orient("right").tickSize(-s).ticks(d3.time.year)).selectAll(".tick").attr("class", function(e) {
             return "tick tick--" + (1984 === e.getFullYear() ? 1984 : e.getFullYear() % 10 ? "minor" : "major") //in 1984 draws a marker
-        }), p.append("g").attr("class", "axis axis--major").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(l).orient("right").tickValues(l.ticks(d3.time.year, 100).concat(l.domain()))), p.append("g").attr("class", "axis axis--major").call(d3.svg.axis().scale(l).orient("left").tickValues(l.ticks(d3.time.year, 50).concat(l.domain())));
+        }), p.append("g").attr("class", "axis axis--major").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(x_domain).orient("right").tickFormat(formatMinutes).tickValues(d3.range(0, 3600, 200))), p.append("g").attr("class", "axis axis--major").call(d3.svg.axis().scale(l).orient("left").tickValues(l.ticks(d3.time.year, 50).concat(l.domain())));
         var u = d3.select("#overlay").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")"), h = d3.select("#graphic-subtitle").append("svg").style("position", "absolute").style("margin-top", "-5px").attr("height", 30).attr("width", 30), f = h.append("g").attr("class", "school school--switch"), y = f.append("linearGradient").attr("id", "school-switch-gradient-key").attr("y1", "100%").attr("y2", "0%").attr("x1", 0).attr("x2", 0);
         y.append("stop").attr("offset", "0%").attr("stop-color", "#d7d7d7"), y.append("stop").attr("offset", "100%").attr("stop-color", "purple"), f.append("path").attr("d", "M" + e(1)([[10, 22], [20, 8]])).style("stroke", "url(#school-switch-gradient-key)"), 
         !function(t) {

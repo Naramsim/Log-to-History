@@ -90,7 +90,10 @@ def get_user_story(log):
                 #preparing tsv flow-chart
                 tsv_dict = {}
                 full_data = parser.parse(req[1],fuzzy=True)
-                hour = full_data.strftime('%M%S')
+                seconds = int( full_data.strftime('%S') ) 
+                minutes = int( full_data.strftime('%M') )
+                hour = seconds + (60*minutes)
+                #print hour
                 folder_requested = "/" + req[2].split("/")[1]
 
                 if len(hours)<2: #for the first two elements, add them anyway
