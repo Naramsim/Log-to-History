@@ -1,5 +1,4 @@
 body {
-    width: 1096px;
     font: 17px/1.5em Georgia;
     margin: auto;
 }
@@ -16,19 +15,27 @@ a:hover {
     color: #999;
 }
 
-#summary {
-    width: 650px;
-    margin: 20px 0 70px 0;
-}
-
 #graphic-and-annotations {
     position: relative;
+    z-index: 10;
+    width: 1096px;
+    margin: auto;
 }
 
+#header {
+    position: fixed;
+    top:0;
+    width: 100%;
+    height:70px;
+    background-color: white;
+    z-index: 20;
+}
+
+#graphic,
 #overlay,
 #annotations {
     position: absolute;
-    top: 0;
+    top: 70px;
     left: 0;
 }
 
@@ -67,14 +74,19 @@ h1 {
 
 #search {
     width: 240px;
-    position: absolute;
+    float: right;
+    margin-right: 210;
+    /*
     right: 0;
-    top: -30px;
+    position: absolute;
+    top: -30px;*/
 }
 
 #graphic-title-and-subtitle {
+    margin-left: 210;
+    /*
     position: absolute;
-    top: -32px;
+    top: -32px;*/
 }
 
 #graphic-title {
@@ -83,6 +95,22 @@ h1 {
 
 #graphic-subtitle {
     font: 300 15px "nyt-franklin", sans-serif;
+}
+
+#folder-label-container {
+    position: fixed;
+    z-index: 40;
+    width: 1096px;
+    left: 50%;
+    margin-left: -507px;
+    top: 50px;
+}
+
+#folder-label {
+    width: 1096px;
+    display: block;
+    margin: auto;
+    height: 20px;
 }
 
 #sources-and-notes div {

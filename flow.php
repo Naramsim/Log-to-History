@@ -11,13 +11,17 @@
   $json_string = json_encode($output1, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);*/
 ?>
 <body>
-	<div id="summary">blablabla</div>
-    <div id="graphic-and-annotations">
+    <div id="header">
         <div id="search"></div>
         <div id="graphic-title-and-subtitle">
             <div id="graphic-title">User History since one hour ago</div>
             <div id="graphic-subtitle">IP switching pages are highlighted as:</div>
         </div>
+    </div>
+    <div id="folder-label-container">
+        <svg id="folder-label"></svg>
+    </div>
+    <div id="graphic-and-annotations">
         <!-- <div id="annotations"></div> -->
         <div id="graphic"></div>
         <div id="overlay"></div>
@@ -91,7 +95,7 @@
                                 if( !(entry[key] in last_req) ){
                                     last_req[ entry[key] ] = key;
                                 }else{
-                                    if (last_req[ entry[key] ] < key)  last_req[ entry[key] ] = key;
+                                    if (+last_req[ entry[key] ] < +key)  last_req[ entry[key] ] = key;
                                 }
                             }
                         }
@@ -315,6 +319,31 @@
             var E = p.append("g").attr("class", "school school--hover").selectAll("path").data(t).enter().append("path").attr("d", function(e) {
                 return d(e.years)
             });
+
+            d3.select("#folder-label").selectAll("path").data(a).enter().append("text").attr("class", function(e) {
+                return "conference-label conference-label--" + e.year
+            }).each(function(e) {
+                var t = e.label.split(" ");
+                e.labelWords = t.map(function(a, n) {
+                    return {word: a,offset: "top" === e.orient ? n - t.length : n + 1.71}
+                })
+            }).attr("transform", function(e) {
+                
+                var  a = x.filter(function(t) {
+                    return t.key === e.id
+                })[0].values.filter(function(t) {
+                    return t.key == e.year
+                })[0].values;
+                return a = (a[0].y + a[a.length - 1].y) / 2, "translate(" + c(a) + "," + 0 + ")"
+            }).selectAll("tspan").data(function(e) {
+
+                return e.labelWords
+            }).enter().append("tspan").attr("x", 0).attr("y", function(e) {
+                return -1.1 * e.offset + "em"
+            }).text(function(e) {
+                return e.word
+            })
+
             p.selectAll(".conference-label").data(a).enter().append("text").attr("class", function(e) {
                 return "conference-label conference-label--" + e.year
             }).each(function(e) {
@@ -337,7 +366,7 @@
                 return 1.1 * e.offset + "em"
             }).text(function(e) {
                 return e.word
-            }), p.append("line").attr("class", "annotation-line").attr("x1", 865).attr("y1", 25).attr("x2", 890).attr("y2", 25), p.append("line").attr("class", "annotation-line").attr("x1", 855).attr("y1", 428).attr("x2", 975).attr("y2", 428), p.append("line").attr("class", "annotation-line").attr("x1", 185).attr("y1", 1320).attr("x2", 185).attr("y2", 1370);
+            })/*, p.append("line").attr("class", "annotation-line").attr("x1", 865).attr("y1", 25).attr("x2", 890).attr("y2", 25), p.append("line").attr("class", "annotation-line").attr("x1", 855).attr("y1", 428).attr("x2", 975).attr("y2", 428), p.append("line").attr("class", "annotation-line").attr("x1", 185).attr("y1", 1320).attr("x2", 185).attr("y2", 1370);*/
             
             var B = u.append("g").attr("class", "tooltip").style("display", "none"), j = B.append("path"), M = B.append("text").attr("dy", ".35em").attr("x", 10);
             u.append("g").attr("class", "voronoi").selectAll("path").data(d3.geom.voronoi().y(function(e) {
