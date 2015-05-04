@@ -1,10 +1,25 @@
 /* 
-
+prepare_graph() is the main function which build the flow graph by parsing a TSV file, the last one has been prepared by the script "main.py"
+This function code is mainly taken by http://www.nytimes.com/newsgraphics/2013/11/30/football-conferences/
+We have adapted the code to fit our data. Since the code in NY times is based to analyze years and our code must analyze seconds to hours, we have adopted a little stratagem:
+    We must pass a single number to the alogrithm, not a datetime of any format(i.e.: %H:%M:%S), we have decided to pass the number of seconds that have passed since the user has chosen
+    The algorithm will work with years but instead unconsciously it processes hours, minutes, and seconds
+    We can say that the algorithm taken by NY timesis a sort of black box for us, we must fit our data to its structure
 */
 
 function prepare_flow_chart(){
 
+    var regInteger = /^\d+$/,
+                 t = [], //array that adjust lines in graph
+                 a = [], //array used to store labels to insert over the lines of the graph
+                 r = 0, //starting second //TODO: make variable
+                 o = 3600, //ending second
+                 n = d3.map();
+
     function e(e) {
+        /*
+        create paramenters to append to svg elements that must be interpolated
+        */
         return function(t) {
             for (var a, n, r, o = t[0][0], i = t[0][1], s = [o, ",", i + e, "v", -2 * e], l = 0, c = t.length; ++l < c; )
                 a = t[l][0], n = t[l][1], r = (i + n) / 2, s.push("C", o, ",", r, " ", a, ",", r, " ", a, ",", n + e, "v", -2 * e), o = a, i = n;
@@ -12,14 +27,16 @@ function prepare_flow_chart(){
         }
     }
 
-    var regInteger = /^\d+$/, t = [], a = [], r = 0, o = 3600, n = d3.map();
-
-    function isInteger( str ) {    
+    function isInteger( str ) {
+        /*regex that checks if string can be considered as int interger*/
         return regInteger.test( str );
     }
 
     function findClosest(arr, id, increasing) {
-        var step = increasing ? 1 : -1;
+        /*
+        method that, in a dictionary(associative array), finds the element after the passed one
+        */
+        var step = increasing ? 1 : -1; //search next or previous
         var i=+id+step;
         if( arr[id]!="" && arr[id]!==undefined ){
             for(; i>=0 && i<=o; i+=step){
@@ -28,36 +45,41 @@ function prepare_flow_chart(){
                 }
             }
         }
-        return false; 
+        return false;
     }
 
     d3.tsv("story.tsv", function(e, data) {
-        data.forEach(function(entry) {
-        	var keys = [];
+    /*
+    Main call that load TSV data
+    Firstly it manipulates the data to fit the NY times algorithm
+    */
+
+        data.forEach(function(entry) { //every entry is an object that represents which folder was seeing a user in a certain time
+        	var keys = []; 
         	var entries = [];
-            for (var key in entry) {
-                if (entry[key]!="" && entry[key]!==undefined && isInteger(key) ){
+            for (var key in entry) { //every object key-value is configured like this-> key:time value:folder_visited
+                if (entry[key]!="" && entry[key]!==undefined && isInteger(key) ){ //if we find a ""(empty string), it means that the user did not changed the folder, it is in the same folder before
                 	keys.push(key)
                 	entries.push(entry[key])
-                    previous_item = findClosest(entry,key,false);
+                    previous_item = findClosest(entry,key,false); //finds the previous and next element relatives to the current key
                     next_item = findClosest(entry,key,true);
-                    if (previous_item && next_item){
-                        previous_item = previous_item + 1;
-                        next_item = next_item - 1; //TODO:check if previous or next is the same page
+                    if (previous_item && next_item){ 
+                        previous_item = previous_item + 1; // this is the second after the user has changed folder
+                        next_item = next_item - 1; // this is the second before the user has changed folder //TODO:check if previous or next is the same page
+                        /*if there is no record thet in those seconds the user has visited other pages we add them to the data*/
                         if ( !(previous_item in entry) || entry[previous_item]=="" || entry[previous_item]===undefined)
                             entry[previous_item] = entry[key];
-
                         if ( !(next_item in entry) || entry[next_item]=="" || entry[next_item]===undefined)
                             entry[next_item] = entry[key];
                     }
                 }
             }
-            if(keys.length == 2){
+            if(keys.length == 2){//little workaround for users that have visited only two pages of the site, we can not find a key that has next and previous element
             	entry[keys[1]-1] = entries[0]
             }
         });
-        var pages = new Set(); //store all folder requested
-        var last_req = new Array(); //store all IP, and their last folder request
+        var pages = new Set(); //store all folder requested by all visitors //TODO: check if we can use last-req
+        var last_req = new Array(); //store all folders with their last request across all visits
         data.forEach(function(entry) {            
             for (var key in entry) {
                 if (entry.hasOwnProperty(key)) {
@@ -65,7 +87,7 @@ function prepare_flow_chart(){
                         if(typeof entry[key] !== "undefined"){
                             if(entry[key] != ""){
                                 pages.add(entry[key])
-                                if( !(entry[key] in last_req) ){
+                                if( !(entry[key] in last_req) ){ //check the request time, update it if it is higher
                                     last_req[ entry[key] ] = key;
                                 }else{
                                     if (+last_req[ entry[key] ] < +key)  last_req[ entry[key] ] = key;
@@ -77,33 +99,35 @@ function prepare_flow_chart(){
             }
         });
         pages.delete("");
-        index = -1; //sets does not have indexes
+        index = -1; //index to cycle the set
         pages.forEach(function(value) {
             var t_element = new Object();
-            t_element.id = value;
+            t_element.id = value; //IP value
             t_element.adjust = -5;
-            t_element.name = value;
+            t_element.name = value;//IP value
             t_element.index = ++index;
             t.push(t_element);
 
             var a_element = new Object();
-            a_element.id = value;
-            a_element.orient = "top";
-            a_element.label = value;
+            a_element.id = value; //IP value
+            a_element.orient = "top"; //top, middle, bottom
+            a_element.label = value; //IP value
             a_element.year = last_req[value];
             a_element.index = index;
             a.push(a_element);
         });
-        n = d3.map();
         t.forEach(function(e, t) {
-            e.index = t, n.set(e.id, e)
+            e.index = t, n.set(e.id, e) //TODO we need it?
         });
         draw(data);
     });
     
     function draw(t) {
-    	var year1 = new Date('January 01, 1995 00:00:00'); year1.setFullYear(1);
-
+        /*
+        method that using manipulated data draws it
+        */
+        var data = t;
+    	var year1 = new Date('January 01, 1995 00:00:00'); year1.setFullYear(1); //this is second zero
     	var formatCount = d3.format(",.0f"),
         formatTime = d3.time.format("%Mm %Ss"),
         formatMinutes = function(d) { 
@@ -119,10 +143,6 @@ function prepare_flow_chart(){
             }
             return output;
         };
-        
-
-    	l_hours = d3.time.scale().domain([year1, new Date(o, 0, 1)]).range([i, 0]);
-        var data = t;
         var margins = {top: 40.5,right: 35.5,bottom: 40.5,left: 65.5}, 
             i = 8230 - margins.left - margins.right,
             s = 1096 - margins.top - margins.bottom, 
@@ -142,7 +162,7 @@ function prepare_flow_chart(){
         var u = d3.select("#overlay").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")"), h = d3.select("#graphic-subtitle").append("svg").style("position", "absolute").style("margin-top", "-5px").attr("height", 30).attr("width", 30), f = h.append("g").attr("class", "school school--switch"), y = f.append("linearGradient").attr("id", "school-switch-gradient-key").attr("y1", "100%").attr("y2", "0%").attr("x1", 0).attr("x2", 0);
         y.append("stop").attr("offset", "0%").attr("stop-color", "#d7d7d7"), y.append("stop").attr("offset", "100%").attr("stop-color", "purple"), f.append("path").attr("d", "M" + e(1)([[10, 22], [20, 8]])).style("stroke", "url(#school-switch-gradient-key)"), 
         !function(t) {
-            console.log(t)
+            //console.log(t) //data manipulated
             function h(e) { //hover
                 if (e) {
                     f(e.school.name);
@@ -159,29 +179,21 @@ function prepare_flow_chart(){
                 })
             }
             function y(e) {
-
                 d3.selectAll(".school--switch-selected").classed("school--switch-selected", !1).select("stop:first-child").attr("stop-color", "#d7d7d7")
-
                 C.classed("school--session-selected", function(t) {
                     return t[0].school.name === e
                 })
-
                 var AA = A.filter(function(t) {
                     return t[0].school.name === e
                 }).each(function() {
                     this.parentNode.appendChild(this)
                 }).classed("school--switch-selected", !0).select("stop:first-child").attr("stop-color", "orange")
-
                 $(".search-select").val(e).trigger("chosen:updated")
-
                 var scrollable = d3.select("body"); 
                 console.log(AA[0][AA[0].length -1]["__data__"][0]["year"])
 			    var scrollheight = 600 //scrollable.property("scrollHeight"); 
-
-			    scrollable.transition().duration(3000).
-			        tween("scroll", scrollTopTween(scrollheight))
+			    scrollable.transition().duration(3000).tween("scroll", scrollTopTween(scrollheight))
 				
-
 				function scrollTopTween(scrollTop) { 
 				    return function() { 
 				        var i = d3.interpolateNumber(this.scrollTop, scrollTop); 

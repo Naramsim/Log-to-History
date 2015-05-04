@@ -1,7 +1,7 @@
 /*
 prepare_graph() is the main function which build a tree by parsing a JSON, the last one has been prepared by the script "main.py"
 this function code is mainly taken by http://bl.ocks.org/mbostock/4339083
-We have only adapted the code to fit our data and added tooltips on node hover
+We have adapted the code to fit our data and added tooltips on node hover
 */
 function prepare_graph(){
   var margin = {top: 20, right: 120, bottom: 20, left: 120},
