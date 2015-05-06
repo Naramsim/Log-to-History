@@ -16,13 +16,21 @@ Every line represent a user history on a specific site, the line can switch colu
 
 '''
 
-import re, sys, json, csv, socket
+import re, sys, json, csv, socket, time
 from dateutil import parser
 
-with open('config.json') as data_file:    
+with open('config.json') as data_file: #loads configuration
     config = json.load(data_file)
 
-print  socket.getfqdn()
+
+if len(sys.argv) > 1:
+    start_point = time.strptime(sys.argv[1], '%Y/%m/%d:%H:%M:%S')   #%Y/%m/%d:%H:%M:%S
+    end_point = time.strptime(sys.argv[2], '%Y/%m/%d:%H:%M:%S') 
+else: # default: 1 hour ago
+    import datetime
+    start_point = datetime.datetime.now().timetuple()
+    end_point = datetime.datetime.now() - datetime.timedelta(hours=1)
+    end_point = end_point.timetuple()
 
 my_site = config["website_name"]
 protocol = config["protocol_used"]
@@ -74,93 +82,94 @@ def get_user_story(log):
 
         requests = get_requests(log) #list with all lines of the access log
 
-        for req in requests:           
-            if ( any(x in req[2] for x in filters) or (req[2].endswith('/')) or (('.') not in req[2]) ): #if page requested is contained in filters or it is a folder
-                # preparing JSON tree
-                IP_index_list = [n for n,el in enumerate(story["children"]) if el["name"] == req[0]]  # IP_index_list is a one-value list, it contains the index of the IP that we are processing
-                # IF IP ALREADY PROCESSED ONCE
-                if req[0] in IPs:
-                    is_ip_new = False
-                    IP_index = IP_index_list[0] # index of processing IP in story["children"]
-                # IF IP IS NEW
-                else:
-                    is_ip_new = True
-                    IPs.append(req[0]) #now it is no more a new IP
-                    ip_dict = {} # this dict contains all information about a visit performed by a user, the IP, the User-Agent, the time, visited pages by him, number of his hits, if it is a spider or not
-                    ip_dict["name"] = req[0] 
-                    ip_dict["UA"] = req[6]
-                    ip_dict["datetime"] = req[1]
-                    ip_dict["children"] = []
-                    ip_dict["count"] = 0
-                    ip_dict["is_bot"] = check_bot(req)
-                    story["children"].append(ip_dict)
-                    IP_index = len(story["children"]) - 1
-
-                story["children"][IP_index]["count"] += 1
-                if my_site not in req[5] :   # if referrer is not defined or come from another site, I create a new first-level node
-                    story["children"][IP_index]["children"].append({"name":req[2], "ref":req[5], "children":[], "datetime":req[1]}) #, "children":[]
-                else:	#if not, i try to chain it
-                    attach_node( story["children"][IP_index]["children"], req )
-
-                #preparing tsv flow-chart
-                tsv_dict = {} #dict used to store the number(name) of an IP, pages visited by him and time of the visits
-                full_data = parser.parse(req[1],fuzzy=True)
-                seconds = int( full_data.strftime('%S') ) 
-                minutes = int( full_data.strftime('%M') ) 
-                hour = seconds + (60*minutes) # hour in seconds of the visit
-                folder_requested = "/" + req[2].split("/")[1]
-
-                if len(hours)<2: #for the first two elements, add them anyway
-                    hours.append(hour)
-                    if is_ip_new:
-                        tsv_dict["name"] = req[0]
-                        tsv_dict["team"] = req[0]
-                        tsv_dict[hour] = folder_requested # key:time value:folder_requested
-                        tsv_list.append(tsv_dict)
+        for req in requests:
+            request_time = time.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call drop the time zone, but it is quicker than dateutil
+            if start_point <= request_time <= end_point:       
+                if ( any(x in req[2] for x in filters) or (req[2].endswith('/')) or (('.') not in req[2]) ): #if page requested is contained in filters or it is a folder
+                    # preparing JSON tree
+                    IP_index_list = [n for n,el in enumerate(story["children"]) if el["name"] == req[0]]  # IP_index_list is a one-value list, it contains the index of the IP that we are processing
+                    # IF IP ALREADY PROCESSED ONCE
+                    if req[0] in IPs:
+                        is_ip_new = False
+                        IP_index = IP_index_list[0] # index of processing IP in story["children"]
+                    # IF IP IS NEW
                     else:
-                        current_dict = search_in_list(req[0],tsv_list)
-                        current_dict[hour] = folder_requested #add this visit to the others performed by the same IP
-                else:
-                    if (len(hours)>2 and hours[-1] > hour) and not hour_changed: 
-                        #print hours[-1]+" "+hour
-                        hour_changed = True #if the hour has changed for now we stop, #TODO fix it
+                        is_ip_new = True
+                        IPs.append(req[0]) #now it is no more a new IP
+                        ip_dict = {} # this dict contains all information about a visit performed by a user, the IP, the User-Agent, the time, visited pages by him, number of his hits, if it is a spider or not
+                        ip_dict["name"] = req[0] 
+                        ip_dict["UA"] = req[6]
+                        ip_dict["datetime"] = req[1]
+                        ip_dict["children"] = []
+                        ip_dict["count"] = 0
+                        ip_dict["is_bot"] = check_bot(req)
+                        story["children"].append(ip_dict)
+                        IP_index = len(story["children"]) - 1
 
-                    if not hour_changed:
+                    story["children"][IP_index]["count"] += 1
+                    if my_site not in req[5] :   # if referrer is not defined or come from another site, I create a new first-level node
+                        story["children"][IP_index]["children"].append({"name":req[2], "ref":req[5], "children":[], "datetime":req[1]}) #, "children":[]
+                    else:	#if not, i try to chain it
+                        attach_node( story["children"][IP_index]["children"], req )
+
+                    #preparing tsv flow-chart
+                    tsv_dict = {} #dict used to store the number(name) of an IP, pages visited by him and time of the visits
+                    full_data = parser.parse(req[1],fuzzy=True)
+                    seconds = int( full_data.strftime('%S') ) 
+                    minutes = int( full_data.strftime('%M') ) 
+                    hour = seconds + (60*minutes) # hour in seconds of the visit
+                    folder_requested = "/" + req[2].split("/")[1]
+
+                    if len(hours)<2: #for the first two elements, add them anyway
                         hours.append(hour)
-
-                    if not hour_changed:
-                        if not is_ip_new:
-                            current_dict = search_in_list(req[0],tsv_list)
-                            current_dict[hour] = folder_requested
-                        else:
-                            #print req[0]
-                            #print "s"
+                        if is_ip_new:
                             tsv_dict["name"] = req[0]
                             tsv_dict["team"] = req[0]
-                            tsv_dict[hour] = folder_requested
+                            tsv_dict[hour] = folder_requested # key:time value:folder_requested
                             tsv_list.append(tsv_dict)
+                        else:
+                            current_dict = search_in_list(req[0],tsv_list)
+                            current_dict[hour] = folder_requested #add this visit to the others performed by the same IP
+                    else:
+                        if (len(hours)>2 and hours[-1] > hour) and not hour_changed: 
+                            #print hours[-1]+" "+hour
+                            hour_changed = True #if the hour has changed for now we stop, #TODO fix it
 
+                        if not hour_changed:
+                            hours.append(hour)
+
+                        if not hour_changed:
+                            if not is_ip_new:
+                                current_dict = search_in_list(req[0],tsv_list)
+                                current_dict[hour] = folder_requested
+                            else:
+                                #print req[0]
+                                #print "s"
+                                tsv_dict["name"] = req[0]
+                                tsv_dict["team"] = req[0]
+                                tsv_dict[hour] = folder_requested
+                                tsv_list.append(tsv_dict)
+
+        #CREATE JSON for Tree
+        JSON_to_write = json.dumps( story, sort_keys=False)
+        file_ = open('accesslog.json', 'w')
+        file_.write(JSON_to_write)
+        file_.close()
+        
+        # CREATE TSV for Chart
+        if(hours[-2] > hours[-1]): 
+            del hours[-1]
+        keys = list(hours)
+        keys.insert(0,"name")
+        keys.insert(1,"team")
+        with open('story.tsv', 'wb') as output_file:
+            dict_writer = csv.DictWriter(output_file, keys,extrasaction='ignore',delimiter="\t")
+            dict_writer.writeheader()
+            dict_writer.writerows(tsv_list)
 
     except Exception as ex:
         print( "[" + str(format( sys.exc_info()[-1].tb_lineno )) + "]: " + str(ex) )    # error line and exception
         exit(1)
-
-    #CREATE JSON for Tree
-    JSON_to_write = json.dumps( story, sort_keys=False)
-    file_ = open('accesslog.json', 'w')
-    file_.write(JSON_to_write)
-    file_.close()
-    
-    # CREATE TSV for Chart
-    if(hours[-2] > hours[-1]): 
-        del hours[-1]
-    keys = list(hours)
-    keys.insert(0,"name")
-    keys.insert(1,"team")
-    with open('story.tsv', 'wb') as output_file:
-        dict_writer = csv.DictWriter(output_file, keys,extrasaction='ignore',delimiter="\t")
-        dict_writer.writeheader()
-        dict_writer.writerows(tsv_list)
 
 
 def attach_node(current_node, req):
@@ -217,7 +226,7 @@ def get_requests(f):
 
 def find(pat, text, match_item):
     '''
-    method that parse a log line using regexs
+    method that parses log lines using regexs
     '''
     match = re.findall(pat, text)
     if match:
