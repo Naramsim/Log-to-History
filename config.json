@@ -1,0 +1,8 @@
+{
+  "whitelist_extensions": [".html",".htm",".php"],
+  "blacklist_folders": ["phpmyadmin"],
+  "rewrite_rules": [],
+  "access_log_location": "atletica2.log",
+  "website_name": "://atletica.me",
+  "protocol_used": "http"
+}

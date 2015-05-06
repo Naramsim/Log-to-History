@@ -16,11 +16,18 @@ Every line represent a user history on a specific site, the line can switch colu
 
 '''
 
-import re, sys, json, csv
+import re, sys, json, csv, socket
 from dateutil import parser
 
-my_site = "://atletica.me"
-protocol = "http"
+with open('config.json') as data_file:    
+    config = json.load(data_file)
+
+print  socket.getfqdn()
+
+my_site = config["website_name"]
+protocol = config["protocol_used"]
+log_dir = config["access_log_location"]
+filters = config["whitelist_extensions"] #extensions of pages that we want to track
 
 def get_user_story(log):
     '''
@@ -53,7 +60,7 @@ def get_user_story(log):
     try:
         IPs = [] # list of processed IPs
         IP_index = 0 # unuseful
-        filters = [".php",".htlm",".htm"] #extensions of pages that we want to track
+        
         
         #data structures needed for accesslog.json
         story = {} #dict of lists of dicts, this structure will be transfomed in the JSON file needed by index.php
@@ -239,7 +246,7 @@ def file_occur(entry):
 if __name__ == '__main__':
 
     #nginx access log, standard format
-    log_file = open('atletica2.log', 'r')
+    log_file = open(log_dir, 'r')
 
     #return dict of entry and total requests
     ret = get_user_story(log_file)
