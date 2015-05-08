@@ -24,8 +24,8 @@ with open('config.json') as data_file: #loads configuration
 
 
 if len(sys.argv) > 1:
-    start_point = time.strptime(sys.argv[1], '%Y/%m/%d:%H:%M:%S')   #%Y/%m/%d:%H:%M:%S
-    end_point = time.strptime(sys.argv[2], '%Y/%m/%d:%H:%M:%S') 
+    start_point = time.strptime(sys.argv[1], '%d/%m/%Y@%H:%M:%S')
+    end_point = time.strptime(sys.argv[2], '%d/%m/%Y@%H:%M:%S')
 else: # default: 1 hour ago
     import datetime
     start_point = datetime.datetime.now().timetuple()
@@ -84,7 +84,7 @@ def get_user_story(log):
 
         for req in requests:
             request_time = time.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call drop the time zone, but it is quicker than dateutil
-            if start_point <= request_time <= end_point:       
+            if start_point <= request_time <= end_point:
                 if ( any(x in req[2] for x in filters) or (req[2].endswith('/')) or (('.') not in req[2]) ): #if page requested is contained in filters or it is a folder
                     # preparing JSON tree
                     IP_index_list = [n for n,el in enumerate(story["children"]) if el["name"] == req[0]]  # IP_index_list is a one-value list, it contains the index of the IP that we are processing

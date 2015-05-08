@@ -9,6 +9,8 @@ We have adapted the code to fit our data. Since the code in NY times is based to
 
 function prepare_flow_chart(){
 
+    $("#search, #folder-label, #graphic, #overlay").empty();
+
     var regInteger = /^\d+$/,
                  t = [], //array that adjust lines in graph
                  a = [], //array used to store labels to insert over the lines of the graph
