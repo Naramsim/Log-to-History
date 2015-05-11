@@ -14,8 +14,8 @@ function prepare_flow_chart(){
     var regInteger = /^\d+$/,
                  t = [], //array that adjust lines in graph
                  a = [], //array used to store labels to insert over the lines of the graph
-                 r = 0, //starting second //TODO: make variable
-                 o = 3600, //ending second
+                 r = 0, //starting second //unusefull
+                 o = 1, //ending time 
                  n = d3.map();
 
     function e(e) {
@@ -41,6 +41,7 @@ function prepare_flow_chart(){
         var step = increasing ? 1 : -1; //search next or previous
         var i=+id+step;
         if( arr[id]!="" && arr[id]!==undefined ){
+            console.log(o)
             for(; i>=0 && i<=o; i+=step){
                 if( arr[i] && arr[i]!=""){
                     return i;
@@ -55,6 +56,30 @@ function prepare_flow_chart(){
     Main call that load TSV data
     Firstly it manipulates the data to fit the NY times algorithm
     */
+
+        var pages = new Set(); //store all folder requested by all visitors //TODO: check if we can use last-req
+        var last_req = new Array(); //store all folders with their last request across all visits
+        data.forEach(function(entry) {            
+            for (var key in entry) {
+                if (entry.hasOwnProperty(key)) {
+                    if ( isInteger(key) ){
+                        if(typeof entry[key] !== "undefined"){
+                            if(entry[key] != ""){
+                                pages.add(entry[key])
+                                if ( !(entry[key] in last_req) ){ //check the request time, update it if it is higher
+                                    last_req[ entry[key] ] = key;
+                                }else{
+                                    if (+last_req[ entry[key] ] < +key)  last_req[ entry[key] ] = key;
+                                }
+                                if (o < +key)  o = key;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        console.log(o)
+        pages.delete("");
 
         data.forEach(function(entry) { //every entry is an object that represents which folder was seeing a user in a certain time
         	var keys = []; 
@@ -76,31 +101,11 @@ function prepare_flow_chart(){
                     }
                 }
             }
-            if(keys.length == 2){//little workaround for users that have visited only two pages of the site, we can not find a key that has next and previous element
+            if (keys.length == 2){//little workaround for users that have visited only two pages of the site, we can not find a key that has next and previous element
             	entry[keys[1]-1] = entries[0]
             }
         });
-        var pages = new Set(); //store all folder requested by all visitors //TODO: check if we can use last-req
-        var last_req = new Array(); //store all folders with their last request across all visits
-        data.forEach(function(entry) {            
-            for (var key in entry) {
-                if (entry.hasOwnProperty(key)) {
-                    if( isInteger(key) ){
-                        if(typeof entry[key] !== "undefined"){
-                            if(entry[key] != ""){
-                                pages.add(entry[key])
-                                if( !(entry[key] in last_req) ){ //check the request time, update it if it is higher
-                                    last_req[ entry[key] ] = key;
-                                }else{
-                                    if (+last_req[ entry[key] ] < +key)  last_req[ entry[key] ] = key;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        pages.delete("");
+        
         index = -1; //index to cycle the set
         pages.forEach(function(value) {
             var t_element = new Object();
@@ -145,11 +150,12 @@ function prepare_flow_chart(){
             }
             return output;
         };
+        
         var margins = {top: 40.5,right: 35.5,bottom: 40.5,left: 65.5}, 
             i = 8230 - margins.left - margins.right,
             s = 1096 - margins.top - margins.bottom, 
             l = d3.time.scale().domain([year1, new Date(o, 0, 1)]).range([i, 0]), 
-            x_domain = d3.scale.linear().domain([0, 3600]).range([i, 0]),
+            x_domain = d3.scale.linear().domain([0, o]).range([i, 0]),
             c = d3.scale.linear().rangeRound([20, s]), 
             d = d3.svg.line().interpolate(e(4.5)).defined(function(e) {
             return e.conference
@@ -164,7 +170,7 @@ function prepare_flow_chart(){
         var u = d3.select("#overlay").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")"), h = d3.select("#graphic-subtitle").append("svg").style("position", "absolute").style("margin-top", "-5px").attr("height", 30).attr("width", 30), f = h.append("g").attr("class", "school school--switch"), y = f.append("linearGradient").attr("id", "school-switch-gradient-key").attr("y1", "100%").attr("y2", "0%").attr("x1", 0).attr("x2", 0);
         y.append("stop").attr("offset", "0%").attr("stop-color", "#d7d7d7"), y.append("stop").attr("offset", "100%").attr("stop-color", "purple"), f.append("path").attr("d", "M" + e(1)([[10, 22], [20, 8]])).style("stroke", "url(#school-switch-gradient-key)"), 
         !function(t) {
-            //console.log(t) //data manipulated
+            console.log(t) //data manipulated
             function h(e) { //hover
                 if (e) {
                     f(e.school.name);
@@ -210,7 +216,8 @@ function prepare_flow_chart(){
                         return !0
             }), t.forEach(function(e) {
                 for (var t, a = e.years = [], i = [], s = r; o >= s; ++s) {
-                    var l = n.get(e[s]), c = {school: e,conference: l,year: s,date: new Date(s, 0, 1)};
+
+                    var l = n.get(e[s]), c = {school: e,conference: l,year: s,date: (new Date(1995, 0, 1)).setFullYear(s)};
                     l ? (t === l && i.forEach(function(e) {
                         e.conference = l
                     }), i = [], t = l) : e[s] || i.push(c), a.push(c), g.push(c)
@@ -339,8 +346,9 @@ function prepare_flow_chart(){
                     return {word: a,offset: "top" === e.orient ? n - t.length : n + 1.71}
                 })
             }).attr("transform", function(e) {
-                
-                var t = Math.max(0, Math.min(i, l(new Date(e.year,0,1)))), a = x.filter(function(t) {
+                newDate = new Date(1995,0,1); newDate.setFullYear(e.year);
+                console.log(newDate);
+                var t = Math.max(0, Math.min(i, l(newDate))), a = x.filter(function(t) {
                     return t.key === e.id
                 })[0].values.filter(function(t) {
                     return t.key == e.year
@@ -363,6 +371,7 @@ function prepare_flow_chart(){
             }).clipExtent([[-40, -40], [s + 40, i + 40]])(g.filter(function(e) {
                 return !isNaN(e.y)
             }))).enter().append("path").attr("d", function(e) {
+                //console.log(e)
                 return "M" + e.join("L") + "Z"
             }).on("mouseover", function(e) {
                 h(e.point)

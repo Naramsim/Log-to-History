@@ -16,7 +16,7 @@ Every line represent a user history on a specific site, the line can switch colu
 
 '''
 
-import re, sys, json, csv, socket, time
+import re, sys, json, csv, socket, time, datetime
 from dateutil import parser
 
 with open('config.json') as data_file: #loads configuration
@@ -83,7 +83,7 @@ def get_user_story(log):
         requests = get_requests(log) #list with all lines of the access log
 
         for req in requests:
-            request_time = time.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call drop the time zone, but it is quicker than dateutil
+            request_time = time.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call loses the time zone, but it is quicker than dateutil
             if start_point <= request_time <= end_point:
                 if ( any(x in req[2] for x in filters) or (req[2].endswith('/')) or (('.') not in req[2]) ): #if page requested is contained in filters or it is a folder
                     # preparing JSON tree
@@ -115,40 +115,24 @@ def get_user_story(log):
                     #preparing tsv flow-chart
                     tsv_dict = {} #dict used to store the number(name) of an IP, pages visited by him and time of the visits
                     full_data = parser.parse(req[1],fuzzy=True)
-                    seconds = int( full_data.strftime('%S') ) 
-                    minutes = int( full_data.strftime('%M') ) 
-                    hour = seconds + (60*minutes) # hour in seconds of the visit
                     folder_requested = "/" + req[2].split("/")[1]
+                    
+                    if not tsv_list:
+                        first_request_time = full_data
+                    
+                    
+                    time_elapsed_since_first = (full_data - first_request_time).seconds
+                    print time_elapsed_since_first
 
-                    if len(hours)<2: #for the first two elements, add them anyway
-                        hours.append(hour)
-                        if is_ip_new:
-                            tsv_dict["name"] = req[0]
-                            tsv_dict["team"] = req[0]
-                            tsv_dict[hour] = folder_requested # key:time value:folder_requested
-                            tsv_list.append(tsv_dict)
-                        else:
-                            current_dict = search_in_list(req[0],tsv_list)
-                            current_dict[hour] = folder_requested #add this visit to the others performed by the same IP
+                    hours.append(time_elapsed_since_first)
+                    if is_ip_new:
+                        tsv_dict["name"] = req[0]
+                        tsv_dict["team"] = req[0]
+                        tsv_dict[time_elapsed_since_first] = folder_requested # key:time value:folder_requested
+                        tsv_list.append(tsv_dict)
                     else:
-                        if (len(hours)>2 and hours[-1] > hour) and not hour_changed: 
-                            #print hours[-1]+" "+hour
-                            hour_changed = True #if the hour has changed for now we stop, #TODO fix it
-
-                        if not hour_changed:
-                            hours.append(hour)
-
-                        if not hour_changed:
-                            if not is_ip_new:
-                                current_dict = search_in_list(req[0],tsv_list)
-                                current_dict[hour] = folder_requested
-                            else:
-                                #print req[0]
-                                #print "s"
-                                tsv_dict["name"] = req[0]
-                                tsv_dict["team"] = req[0]
-                                tsv_dict[hour] = folder_requested
-                                tsv_list.append(tsv_dict)
+                        current_dict = search_in_list(req[0],tsv_list)
+                        current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
 
         #CREATE JSON for Tree
         JSON_to_write = json.dumps( story, sort_keys=False)
@@ -157,8 +141,6 @@ def get_user_story(log):
         file_.close()
         
         # CREATE TSV for Chart
-        if(hours[-2] > hours[-1]): 
-            del hours[-1]
         keys = list(hours)
         keys.insert(0,"name")
         keys.insert(1,"team")
