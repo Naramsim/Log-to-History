@@ -36,6 +36,7 @@ my_site = config["website_name"]
 protocol = config["protocol_used"]
 log_dir = config["access_log_location"]
 filters = config["whitelist_extensions"] #extensions of pages that we want to track
+black_folders = config["blacklist_folders"]
 
 def get_user_story(log):
     '''
@@ -84,7 +85,7 @@ def get_user_story(log):
 
         for req in requests:
             request_time = time.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call loses the time zone, but it is quicker than dateutil
-            if start_point <= request_time <= end_point:
+            if ( start_point <= request_time <= end_point ) and ( not any(black in req[2] for black in black_folders ) ):
                 if ( any(x in req[2] for x in filters) or (req[2].endswith('/')) or (('.') not in req[2]) ): #if page requested is contained in filters or it is a folder
                     # preparing JSON tree
                     IP_index_list = [n for n,el in enumerate(story["children"]) if el["name"] == req[0]]  # IP_index_list is a one-value list, it contains the index of the IP that we are processing
@@ -120,10 +121,7 @@ def get_user_story(log):
                     if not tsv_list:
                         first_request_time = full_data
                     
-                    
                     time_elapsed_since_first = (full_data - first_request_time).seconds
-                    print time_elapsed_since_first
-
                     hours.append(time_elapsed_since_first)
                     if is_ip_new:
                         tsv_dict["name"] = req[0]
