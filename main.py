@@ -37,6 +37,7 @@ protocol = config["protocol_used"]
 log_dir = config["access_log_location"]
 filters = config["whitelist_extensions"] #extensions of pages that we want to track
 black_folders = config["blacklist_folders"]
+depth = config["folder_level"]
 
 def get_user_story(log):
     '''
@@ -116,7 +117,16 @@ def get_user_story(log):
                     #preparing tsv flow-chart
                     tsv_dict = {} #dict used to store the number(name) of an IP, pages visited by him and time of the visits
                     full_data = parser.parse(req[1],fuzzy=True)
-                    folder_requested = "/" + req[2].split("/")[1]
+                    token = req[2].split("/")
+                    folder_requested = ""
+                    #print depth
+                    if (len(token) <= depth) and (depth>0):
+                        current_depth = len(token) - 1
+                    else:
+                        current_depth = depth
+                    for count in range(1,current_depth+1):
+                        folder_requested += "/" + token[count]
+                    
                     
                     if not tsv_list:
                         first_request_time = full_data
