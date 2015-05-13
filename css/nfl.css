@@ -180,7 +180,7 @@ h1 {
 }
 
 .school--switch {
-    marker-end: url(#arrowhead);
+    /*marker-end: url(#arrowhead);*/
 }
 
 .school--switch--enter {

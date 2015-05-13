@@ -41,7 +41,7 @@ function prepare_flow_chart(){
         var step = increasing ? 1 : -1; //search next or previous
         var i=+id+step;
         if( arr[id]!="" && arr[id]!==undefined ){
-            console.log(o)
+            //console.log(o)
             for(; i>=0 && i<=o; i+=step){
                 if( arr[i] && arr[i]!=""){
                     return i;
@@ -98,6 +98,9 @@ function prepare_flow_chart(){
                             entry[previous_item] = entry[key];
                         if ( !(next_item in entry) || entry[next_item]=="" || entry[next_item]===undefined)
                             entry[next_item] = entry[key];
+                    }
+                    else if ( (previous_item && !next_item) || (!previous_item && !next_item)){ //if it is a last visit or a single visit, this make it last 10 seconds
+                    	entry[+key + 10] = entry[key] 
                     }
                 }
             }
@@ -168,7 +171,7 @@ function prepare_flow_chart(){
             return "tick tick--" + (1984 === e.getFullYear() ? 1984 : e.getFullYear() % 10 ? "minor" : "major") //in 1984 draws a marker
         }), p.append("g").attr("class", "axis axis--major").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(x_domain).orient("right").tickFormat(formatMinutes).tickValues(d3.range(0, 3600, 200))), p.append("g").attr("class", "axis axis--major").call(d3.svg.axis().scale(l).orient("left").tickValues(l.ticks(d3.time.year, 50).concat(l.domain())));
         var u = d3.select("#overlay").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")"), h = d3.select("#graphic-subtitle").append("svg").style("position", "absolute").style("margin-top", "-5px").attr("height", 30).attr("width", 30), f = h.append("g").attr("class", "school school--switch"), y = f.append("linearGradient").attr("id", "school-switch-gradient-key").attr("y1", "100%").attr("y2", "0%").attr("x1", 0).attr("x2", 0);
-        y.append("stop").attr("offset", "0%").attr("stop-color", "#d7d7d7"), y.append("stop").attr("offset", "100%").attr("stop-color", "purple"), f.append("path").attr("d", "M" + e(1)([[10, 22], [20, 8]])).style("stroke", "url(#school-switch-gradient-key)"), 
+        y.append("stop").attr("offset", "0%").attr("stop-color", "#d7d7d7"), y.append("stop").attr("offset", "100%").attr("stop-color", "#d7d7d7"), f.append("path").attr("d", "M" + e(1)([[10, 22], [20, 8]])).style("stroke", "url(#school-switch-gradient-key)"), /* TODO delete gradient if not needed*/
         !function(t) {
             console.log(t) //data manipulated
             function h(e) { //hover
@@ -304,10 +307,10 @@ function prepare_flow_chart(){
                 return e[1] ? l(e[1].date) : l(e[0].date) + (e.enter ? 5 : -5)
             }).attr("x1", 0).attr("x2", 0);
             S.append("stop").attr("offset", "0%").attr("stop-color", function(e) {
-                return e.enter || e.exit ? "purple" : "#d7d7d7"
+                return e.enter || e.exit ? "#d7d7d7" : "#d7d7d7" /*TODO if not needed, delete*/
             }).attr("stop-opacity", function(e) {
                 return e.enter || e.exit ? 0 : 1
-            }), S.append("stop").attr("offset", "100%").attr("stop-color", "purple"), A.append("path").attr("d", d).style("stroke", function(e, t) {
+            }), S.append("stop").attr("offset", "100%").attr("stop-color", "#d7d7d7"), A.append("path").attr("d", d).style("stroke", function(e, t) {
                 return "url(#school-switch-gradient-" + t + ")"
             });
             var E = p.append("g").attr("class", "school school--hover").selectAll("path").data(t).enter().append("path").attr("d", function(e) {
