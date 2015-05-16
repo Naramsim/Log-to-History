@@ -18,6 +18,7 @@ Every line represent a user history on a specific site, the line can switch colu
 
 import re, sys, json, csv, socket, time, datetime
 from dateutil import parser
+from collections import OrderedDict
 
 with open('config.json') as data_file: #loads configuration
     config = json.load(data_file)
@@ -115,19 +116,11 @@ def get_user_story(log):
                         attach_node( story["children"][IP_index]["children"], req )
 
                     #preparing tsv flow-chart
-                    tsv_dict = {} #dict used to store the number(name) of an IP, pages visited by him and time of the visits
+                    tsv_dict = OrderedDict() #dict used to store the number(name) of an IP, pages visited by him and time of the visits
                     full_data = parser.parse(req[1],fuzzy=True)
-                    token = req[2].split("/")
-                    folder_requested = ""
-                    #print depth
-                    if (len(token) <= depth) and (depth>0):
-                        current_depth = len(token) - 1
-                    else:
-                        current_depth = depth
-                    for count in range(1,current_depth+1):
-                        folder_requested += "/" + token[count]
                     
-                    
+                    folder_requested = get_folder(req[2])
+
                     if not tsv_list:
                         first_request_time = full_data
                     
@@ -140,6 +133,12 @@ def get_user_story(log):
                         tsv_list.append(tsv_dict)
                     else:
                         current_dict = search_in_list(req[0],tsv_list)
+                        last_key = next(reversed(current_dict))
+                        if my_site in req[5]: #if the referrer comes from our site
+                            referrer_folder = get_folder( re.sub('^'+protocol+my_site, '', req[5]) )
+                            if (current_dict[last_key] != referrer_folder) and (referrer_folder != folder_requested) and (not (+time_elapsed_since_first-2 < +last_key)):
+                                mean = (+last_key + +time_elapsed_since_first)/2
+                                current_dict[mean] = referrer_folder
                         current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
 
         #CREATE JSON for Tree
@@ -153,7 +152,7 @@ def get_user_story(log):
         keys.insert(0,"name")
         keys.insert(1,"team")
         with open('story.tsv', 'wb') as output_file:
-            dict_writer = csv.DictWriter(output_file, keys,extrasaction='ignore',delimiter="\t")
+            dict_writer = csv.DictWriter(output_file, keys, extrasaction='ignore', delimiter="\t")
             dict_writer.writeheader()
             dict_writer.writerows(tsv_list)
 
@@ -196,6 +195,22 @@ def search_in_list(name, _list):
         if p['name'] == name:
             return p
 
+
+def get_folder(url):
+    '''
+    method that cut an URL on a specific folder depth
+    if depth==1 get_folder("/atleta/profilo/index.php")==/atleta
+    '''
+    token = url.split("/")
+    folder = ""
+    #print depth
+    if (len(token) <= depth) and (depth>0):
+        current_depth = len(token) - 1
+    else:
+        current_depth = depth
+    for count in range(1,current_depth+1):
+        folder += "/" + token[count]
+    return folder
 
 def get_requests(f):
     '''
