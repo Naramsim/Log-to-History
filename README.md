@@ -1,4 +1,4 @@
-# Log-to-Histroy
+# Log-to-History
 This access.log parser creates two beautiful representation of users history on a site.
 This means that we can see which pages was browsed by every user, and more interestingly the users history
 There are two representation, one tree graph and one flow graph.
