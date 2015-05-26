@@ -23,22 +23,24 @@ from collections import OrderedDict
 with open('config.json') as data_file: #loads configuration
     config = json.load(data_file)
 
-
+to_render = -1
 if len(sys.argv) > 1:
     start_point = time.strptime(sys.argv[1], '%d/%m/%Y@%H:%M:%S')
     end_point = time.strptime(sys.argv[2], '%d/%m/%Y@%H:%M:%S')
+    to_render = sys.argv[3]
 else: # default: 1 hour ago
     import datetime
     start_point = datetime.datetime.now().timetuple()
     end_point = datetime.datetime.now() - datetime.timedelta(hours=1)
     end_point = end_point.timetuple()
-
+to_render = int(to_render)
 my_site = config["website_name"]
 protocol = config["protocol_used"]
 log_dir = config["access_log_location"]
 filters = config["whitelist_extensions"] #extensions of pages that we want to track
 black_folders = config["blacklist_folders"]
 depth = config["folder_level"]
+scanning_interval = 10
 
 def get_user_story(log):
     '''
@@ -83,13 +85,18 @@ def get_user_story(log):
         hours = [] #list that contains every hour while there was a page request, these hours will be keys(first row) of our tsv file
         hour_changed = False #boolean needed to understand if the hour has changed, i.e.: from 10.57 to 11.01
 
+        #data structures needed for stack.json
+        '''stack_list = []
+        all_folders = []
+        end_interval = -1'''
+
         requests = get_requests(log) #list with all lines of the access log
 
         for req in requests:
             request_time = time.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call loses the time zone, but it is quicker than dateutil
             if ( start_point <= request_time <= end_point ) and ( not any(black in req[2] for black in black_folders ) ):
                 if ( any(x in req[2] for x in filters) or (req[2].endswith('/')) or (('.') not in req[2]) ): #if page requested is contained in filters or it is a folder
-                    # preparing JSON tree
+                    
                     IP_index_list = [n for n,el in enumerate(story["children"]) if el["name"] == req[0]]  # IP_index_list is a one-value list, it contains the index of the IP that we are processing
                     # IF IP ALREADY PROCESSED ONCE
                     if req[0] in IPs:
@@ -109,52 +116,85 @@ def get_user_story(log):
                         story["children"].append(ip_dict)
                         IP_index = len(story["children"]) - 1
 
-                    story["children"][IP_index]["count"] += 1
-                    if my_site not in req[5] :   # if referrer is not defined or come from another site, I create a new first-level node
-                        story["children"][IP_index]["children"].append({"name":req[2], "ref":req[5], "children":[], "datetime":req[1]}) #, "children":[]
-                    else:	#if not, i try to chain it
-                        attach_node( story["children"][IP_index]["children"], req )
+                    if to_render == 0:
+                        # preparing JSON tree
+                        story["children"][IP_index]["count"] += 1
+                        if my_site not in req[5] :   # if referrer is not defined or come from another site, I create a new first-level node
+                            story["children"][IP_index]["children"].append({"name":req[2], "ref":req[5], "children":[], "datetime":req[1]}) #, "children":[]
+                        else:	#if not, i try to chain it
+                            attach_node( story["children"][IP_index]["children"], req )
+                    if to_render > 0:
+                        #preparing TSV flow-chart and JSON stack
+                        tsv_dict = OrderedDict() #dict used to store the number(name) of an IP, pages visited by him and time of the visits
+                        full_data = parser.parse(req[1],fuzzy=True)
+                        
+                        folder_requested = get_folder(req[2])
 
-                    #preparing tsv flow-chart
-                    tsv_dict = OrderedDict() #dict used to store the number(name) of an IP, pages visited by him and time of the visits
-                    full_data = parser.parse(req[1],fuzzy=True)
-                    
-                    folder_requested = get_folder(req[2])
+                        if not tsv_list:
+                            first_request_time = full_data
+                        
+                        #print full_data
+                        #print first_request_time
+                        time_elapsed_since_first = (full_data - first_request_time).seconds + ((full_data - first_request_time).days * 86400)
+                        hours.append(time_elapsed_since_first)
+                        if is_ip_new:
+                            tsv_dict["name"] = req[0]
+                            tsv_dict["team"] = req[0]
+                            tsv_dict[time_elapsed_since_first] = folder_requested # key:time value:folder_requested
+                            tsv_list.append(tsv_dict)
+                        else:
+                            current_dict = search_in_list(req[0],tsv_list)
+                            last_key = next(reversed(current_dict))
+                            if my_site in req[5]: #if the referrer comes from our site
+                                referrer_folder = get_folder( re.sub('^'+protocol+my_site, '', req[5]) )
+                                if (current_dict[last_key] != referrer_folder) and (referrer_folder != folder_requested) and (not (+time_elapsed_since_first-2 < +last_key)):
+                                    mean = (+last_key + +time_elapsed_since_first)/2
+                                    current_dict[mean] = referrer_folder
+                            current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
 
-                    if not tsv_list:
-                        first_request_time = full_data
-                    
-                    time_elapsed_since_first = (full_data - first_request_time).seconds
-                    hours.append(time_elapsed_since_first)
-                    if is_ip_new:
-                        tsv_dict["name"] = req[0]
-                        tsv_dict["team"] = req[0]
-                        tsv_dict[time_elapsed_since_first] = folder_requested # key:time value:folder_requested
-                        tsv_list.append(tsv_dict)
+                    # preparing JSON stack chart
+                    '''if folder_requested not in all_folders:
+                        all_folders.append(folder_requested)
+                        folder_dict = {}
+                        folder_dict["key"]= folder_requested
+                        folder_dict["values"] = []
+                        stack_list.append(folder_dict)
+
+                    if end_interval == -1: #todo change tsv_list
+                        end_interval = first_request_time + datetime.timedelta(seconds=scanning_interval) #10 seconds interval
+                    if full_data <= end_interval:
+                        for folder in stack_list:
+                            new_time = [end_interval - scanning_interval , 0]
+                            folder["values"].append(new_time)
                     else:
-                        current_dict = search_in_list(req[0],tsv_list)
-                        last_key = next(reversed(current_dict))
-                        if my_site in req[5]: #if the referrer comes from our site
-                            referrer_folder = get_folder( re.sub('^'+protocol+my_site, '', req[5]) )
-                            if (current_dict[last_key] != referrer_folder) and (referrer_folder != folder_requested) and (not (+time_elapsed_since_first-2 < +last_key)):
-                                mean = (+last_key + +time_elapsed_since_first)/2
-                                current_dict[mean] = referrer_folder
-                        current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
+                        end_interval = end_interval + datetime.timedelta(seconds=scanning_interval)
+                        #todo add the element'''
 
-        #CREATE JSON for Tree
-        JSON_to_write = json.dumps( story, sort_keys=False)
-        file_ = open('accesslog.json', 'w')
-        file_.write(JSON_to_write)
-        file_.close()
-        
-        # CREATE TSV for Chart
-        keys = list(hours)
-        keys.insert(0,"name")
-        keys.insert(1,"team")
-        with open('story.tsv', 'wb') as output_file:
-            dict_writer = csv.DictWriter(output_file, keys, extrasaction='ignore', delimiter="\t")
-            dict_writer.writeheader()
-            dict_writer.writerows(tsv_list)
+                    
+
+
+        if to_render == 0:
+            #CREATE JSON for Tree
+            JSON_to_write = json.dumps( story, sort_keys=False)
+            file_ = open('accesslog.json', 'w')
+            file_.write(JSON_to_write)
+            file_.close()
+        if to_render == 1:
+            # CREATE TSV for Chart
+            print tsv_list
+            keys = list(hours)
+            keys.insert(0,"name")
+            keys.insert(1,"team")
+            with open('story.tsv', 'wb') as output_file:
+                dict_writer = csv.DictWriter(output_file, keys, extrasaction='ignore', delimiter="\t")
+                dict_writer.writeheader()
+                dict_writer.writerows(tsv_list)
+        if to_render == 2:
+            # CREATE JSON for Stack Chart
+            JSON_to_write = json.dumps( tsv_list, sort_keys=False)
+            file_ = open('stack.json', 'w')
+            file_.write(JSON_to_write)
+            file_.close()
 
     except Exception as ex:
         print( "[" + str(format( sys.exc_info()[-1].tb_lineno )) + "]: " + str(ex) )    # error line and exception
