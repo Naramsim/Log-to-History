@@ -56,7 +56,7 @@ function prepare_flow_chart(){
     Main call that load TSV data
     Firstly it manipulates the data to fit the NY times algorithm
     */
-
+        console.log(data)
         var pages = new Set(); //store all folder requested by all visitors //TODO: check if we can use last-req
         var last_req = new Array(); //store all folders with their last request across all visits
         data.forEach(function(entry) {            
@@ -78,7 +78,7 @@ function prepare_flow_chart(){
                 }
             }
         });
-        console.log(o)
+        //console.log(o)
         pages.delete("");
 
         data.forEach(function(entry) { //every entry is an object that represents which folder was seeing a user in a certain time
@@ -160,7 +160,7 @@ function prepare_flow_chart(){
             l = d3.time.scale().domain([year1, new Date(o, 0, 1)]).range([i, 0]), 
             x_domain = d3.scale.linear().domain([0, o]).range([i, 0]),
             c = d3.scale.linear().rangeRound([20, s]), 
-            d = d3.svg.line().interpolate(e(4.5)).defined(function(e) {
+            d = d3.svg.line().interpolate(e(0.1)).defined(function(e) {
             return e.conference
         }).y(function(e) {
             return l(e.date)
@@ -173,7 +173,7 @@ function prepare_flow_chart(){
         var u = d3.select("#overlay").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")"), h = d3.select("#graphic-subtitle").append("svg").style("position", "absolute").style("margin-top", "-5px").attr("height", 30).attr("width", 30), f = h.append("g").attr("class", "school school--switch"), y = f.append("linearGradient").attr("id", "school-switch-gradient-key").attr("y1", "100%").attr("y2", "0%").attr("x1", 0).attr("x2", 0);
         y.append("stop").attr("offset", "0%").attr("stop-color", "#d7d7d7"), y.append("stop").attr("offset", "100%").attr("stop-color", "#d7d7d7"), f.append("path").attr("d", "M" + e(1)([[10, 22], [20, 8]])).style("stroke", "url(#school-switch-gradient-key)"), /* TODO delete gradient if not needed*/
         !function(t) {
-            console.log(t) //data manipulated
+            //console.log(t) //data manipulated
             function h(e) { //hover
                 if (e) {
                     f(e.school.name);
@@ -350,7 +350,6 @@ function prepare_flow_chart(){
                 })
             }).attr("transform", function(e) {
                 newDate = new Date(1995,0,1); newDate.setFullYear(e.year);
-                console.log(newDate);
                 var t = Math.max(0, Math.min(i, l(newDate))), a = x.filter(function(t) {
                     return t.key === e.id
                 })[0].values.filter(function(t) {

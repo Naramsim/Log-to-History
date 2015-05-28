@@ -27,7 +27,7 @@ function prepare_graph(){
       return " <span style='color:lightsteelblue'>" + d.datetime + "</span>";
     })
 
-  var svg = d3.select("body").append("svg")
+  var svg = d3.select("#graph").append("svg")
       .attr("width", width + margin.right + margin.left)
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
