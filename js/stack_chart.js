@@ -48,8 +48,9 @@ function prepare_stack(){
   }
 
   d3.json("stack.json" , function(data) {
+  	//console.log(data)
     var pages = new Set(); //store all folder requested by all visitors 
-    data.forEach(function(entry) {            
+    data["data"].forEach(function(entry) {            
         for (var key in entry) {
   			if (entry.hasOwnProperty(key)) {
   				if ( isInteger(key) ){
@@ -79,28 +80,28 @@ function prepare_stack(){
     });
 
     //filling each time interval with the proper value
-    data.forEach(function(entry){
+    data["data"].forEach(function(entry){
       for (var key in entry) {
         if (entry.hasOwnProperty(key) && isInteger(key) && typeof entry[key] !== "undefined" && entry[key] != ""){
           next_item = findClosest(entry, key, true)
           folder = entry[key]
           //console.log(data_folders[folder_index[folder]]["values"])
           has_started = false;
-          console.log("starting with key="+key)
+          //console.log("starting with key="+key)
           data_folders[folder_index[folder]]["values"].every(function(interval){
               if(+key >= +interval[0] && +key <= +interval[0]+time_interval){
                   interval[1]++;
-                  console.log("plus 1 for "+folder+" starting in "+ interval[0]+", ending in "+ next_item)
+                  //console.log("plus 1 for "+folder+" starting in "+ interval[0]+", ending in "+ next_item)
                   has_started = true;
                   return true; 
               }
               else if(has_started && +next_item > +interval[0]+time_interval){
                   interval[1]++;
-                  console.log("plus 1 for "+folder+" continuing to"+ interval[0]);
+                  //console.log("plus 1 for "+folder+" continuing to"+ interval[0]);
                   return true;
               }
               else if(has_started && +next_item >= +interval[0] && +next_item <= +interval[0]+time_interval){
-                  console.log(folder+" ending to"+ interval[0]);
+                  //console.log(folder+" ending to"+ interval[0]);
                   return false; //break
               }
               else{
@@ -113,13 +114,13 @@ function prepare_stack(){
         }
       }
     });
-    console.log(data_folders);
+    //console.log(data_folders);
     datam = JSON.parse(JSON.stringify(data_folders))
 
     nv.addGraph(function() {
         chart = nv.models.stackedAreaChart()
             .useInteractiveGuideline(true)
-            .x(function(d) {/*console.log(data_folders); */return new Date(d[0]*1000) })//seconds to milliseconds
+            .x(function(d) {/*console.log(d[0]);*/ return new Date(d[0] + data["start_time"] - 3600000) })//convert to local timestamp
             .y(function(d) { return d[1]; })
             .controlLabels({stacked: "Stacked"})
             .color(keyColor)

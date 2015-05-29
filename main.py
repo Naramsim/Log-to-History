@@ -191,7 +191,10 @@ def get_user_story(log):
                 dict_writer.writerows(tsv_list)
         if to_render == 2:
             # CREATE JSON for Stack Chart
-            JSON_to_write = json.dumps( tsv_list, sort_keys=False)
+            stack_json = {}
+            stack_json["start_time"] = int(first_request_time.strftime("%s")) * 1000
+            stack_json["data"] = tsv_list
+            JSON_to_write = json.dumps( stack_json, sort_keys=False)
             file_ = open('stack.json', 'w')
             file_.write(JSON_to_write)
             file_.close()
