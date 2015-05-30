@@ -26,7 +26,7 @@ In this case the script is called "main.py", and the Javascript code is in "tree
 <?php 
 	if( isset($_POST['start_date']) && isset($_POST['end_date']) ){
 		//print $_POST['start_date']." ".$_POST['end_date'];
-		$command = "./main.py ".$_POST['start_date']." ".$_POST['end_date']." 0";
+		$command = "./main.py ".$_POST['start_date']." ".$_POST['end_date']." 0";	
 		print $command;
 		ob_start();
 		system($command, $status);
@@ -74,7 +74,7 @@ In this case the script is called "main.py", and the Javascript code is in "tree
 					var to_submit_e = $("#end_date").val();
 		        	if( (date_regex.test(to_submit_s)) && (date_regex.test(to_submit_e)) ){
 		        		$.ajax({
-							url: 'flow.php',
+							url: 'tree.php',
 							type: 'POST',
 							data: { 'start_date': to_submit_s,
 									'end_date': to_submit_e}, // An object with the key 'submit' and value 'true;

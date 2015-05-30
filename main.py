@@ -40,9 +40,9 @@ log_dir = config["access_log_location"]
 filters = config["whitelist_extensions"] #extensions of pages that we want to track
 black_folders = config["blacklist_folders"]
 depth = config["folder_level"]
-scanning_interval = 10
+scanning_interval = 10 #seconds
 
-def get_user_story(log):
+def get_user_story():
     '''
     analyzes a log file and creates two files, one needed by index.php, the other one by flow.php
     the index file is called accesslog.json, it consists in a JSON formatted like this:
@@ -90,9 +90,10 @@ def get_user_story(log):
         all_folders = []
         end_interval = -1'''
 
-        requests = get_requests(log) #list with all lines of the access log
+        requests = get_requests() #list with all lines of the access log
 
         for req in requests:
+            
             request_time = time.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call loses the time zone, but it is quicker than dateutil
             if ( start_point <= request_time <= end_point ) and ( not any(black in req[2] for black in black_folders ) ):
                 if ( any(x in req[2] for x in filters) or (req[2].endswith('/')) or (('.') not in req[2]) ): #if page requested is contained in filters or it is a folder
@@ -181,7 +182,6 @@ def get_user_story(log):
             file_.close()
         if to_render == 1:
             # CREATE TSV for Chart
-            print tsv_list
             keys = list(hours)
             keys.insert(0,"name")
             keys.insert(1,"team")
@@ -255,11 +255,10 @@ def get_folder(url):
         folder += "/" + token[count]
     return folder
 
-def get_requests(f):
+def get_requests():
     '''
     method that creates a list containing all requests done on a site
     '''
-    log_line = f.read()
     pat = (r''
             '(\d+.\d+.\d+.\d+)\s-\s-\s' #IP address: 0
             '\[(.+)\]\s' #datetime: 1
@@ -269,8 +268,17 @@ def get_requests(f):
             '"(.+)"\s' #referrer: 5
             '"(.+)"' #user agent: 6
         )
-    requests = find(pat, log_line, None)
-    return requests #array of all access log lines
+    with open(log_dir, "r") as access_log_file:
+        requests = []
+        for line in access_log_file:
+            compiled_line = find(pat, line, None)
+            if compiled_line:
+                compiled_line = compiled_line[0] # convert our [("","","")] to ("","","")
+                request_time = time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call loses the time zone, but it is quicker than using dateutil
+                if ( start_point <= request_time <= end_point ) and ( not any(black in compiled_line[2] for black in black_folders ) ):
+                    if ( any(x in compiled_line[2] for x in filters) or (compiled_line[2].endswith('/')) or (('.') not in compiled_line[2]) ):
+                        requests.append(compiled_line)
+    return requests #list of all access log lines
 
 def find(pat, text, match_item):
     '''
@@ -301,12 +309,8 @@ def file_occur(entry):
     return d
 
 if __name__ == '__main__':
-
-    #nginx access log, standard format
-    log_file = open(log_dir, 'r')
-
     #return dict of entry and total requests
-    ret = get_user_story(log_file)
+    ret = get_user_story()
     
 
 
