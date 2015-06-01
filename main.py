@@ -16,7 +16,7 @@ Every line represent a user history on a specific site, the line can switch colu
 
 '''
 
-import re, sys, json, csv, socket, time, datetime
+import re, sys, json, csv, socket, time, datetime, os
 from dateutil import parser
 from collections import OrderedDict
 
@@ -149,9 +149,11 @@ def get_user_story():
                             if my_site in req[5]: #if the referrer comes from our site
                                 referrer_folder = get_folder( re.sub('^'+protocol+my_site, '', req[5]) )
                                 if (current_dict[last_key] != referrer_folder) and (referrer_folder != folder_requested) and (not (+time_elapsed_since_first-2 < +last_key)):
-                                    mean = (+last_key + +time_elapsed_since_first)/2
-                                    current_dict[mean] = referrer_folder
+                                    if not any(black in referrer_folder for black in black_folders ):
+                                        mean = (+last_key + +time_elapsed_since_first)/2
+                                        current_dict[mean] = referrer_folder
                             current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
+
 
                     # preparing JSON stack chart
                     '''if folder_requested not in all_folders:
@@ -172,30 +174,32 @@ def get_user_story():
                         #todo add the element'''
 
                     
-
+        if not os.path.exists("data"):
+            os.makedirs("data")
 
         if to_render == 0:
             #CREATE JSON for Tree
             JSON_to_write = json.dumps( story, sort_keys=False)
-            file_ = open('accesslog.json', 'w')
+            file_ = open('data/tree.json', 'w')
             file_.write(JSON_to_write)
             file_.close()
         if to_render == 1:
-            # CREATE TSV for Chart
-            keys = list(hours)
-            keys.insert(0,"name")
-            keys.insert(1,"team")
-            with open('story.tsv', 'wb') as output_file:
-                dict_writer = csv.DictWriter(output_file, keys, extrasaction='ignore', delimiter="\t")
-                dict_writer.writeheader()
-                dict_writer.writerows(tsv_list)
+            # CREATE JSON for Chart
+            stack_json = {}
+            stack_json["start_time"] = int(first_request_time.strftime("%s")) * 1000
+            stack_json["data"] = tsv_list
+            JSON_to_write = json.dumps( tsv_list, sort_keys=False)
+            #print tsv_list
+            file_ = open('data/flow.json', 'w')
+            file_.write(JSON_to_write)
+            file_.close()
         if to_render == 2:
             # CREATE JSON for Stack Chart
             stack_json = {}
             stack_json["start_time"] = int(first_request_time.strftime("%s")) * 1000
             stack_json["data"] = tsv_list
             JSON_to_write = json.dumps( stack_json, sort_keys=False)
-            file_ = open('stack.json', 'w')
+            file_ = open('data/stack.json', 'w')
             file_.write(JSON_to_write)
             file_.close()
 

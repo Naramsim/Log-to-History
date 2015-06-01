@@ -35,7 +35,7 @@ function prepare_graph(){
 
   svg.call(tip);
 
-  d3.json("accesslog.json", function(error, flare) {
+  d3.json("data/tree.json", function(error, flare) {
     root = flare;
     root.x0 = height / 2;
     root.y0 = 0;
