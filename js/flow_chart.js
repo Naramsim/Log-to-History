@@ -16,6 +16,7 @@ function prepare_flow_chart(){
                  a = [], //array used to store labels to insert over the lines of the graph
                  r = 0, //starting second //unusefull
                  o = 1, //ending time 
+                 starting_time = 0,
                  n = d3.map();
 
     function e(e) {
@@ -56,10 +57,11 @@ function prepare_flow_chart(){
     Main call that load TSV data
     Firstly it manipulates the data to fit the NY times algorithm
     */
-        console.log(data)
+        console.log(data);
+        starting_time = data["start_time"];
         var pages = new Set(); //store all folder requested by all visitors //TODO: check if we can use last-req
         var last_req = new Array(); //store all folders with their last request across all visits
-        data.forEach(function(entry) {            
+        data["data"].forEach(function(entry) {            
             for (var key in entry) {
                 if (entry.hasOwnProperty(key)) {
                     if ( isInteger(key) ){
@@ -81,7 +83,7 @@ function prepare_flow_chart(){
         //console.log(o)
         pages.delete("");
 
-        data.forEach(function(entry) { //every entry is an object that represents which folder was seeing a user in a certain time
+        data["data"].forEach(function(entry) { //every entry is an object that represents which folder was seeing a user in a certain time
         	var keys = []; 
         	var entries = [];
             for (var key in entry) { //every object key-value is configured like this-> key:time value:folder_visited
@@ -129,7 +131,7 @@ function prepare_flow_chart(){
         t.forEach(function(e, t) {
             e.index = t, n.set(e.id, e) //TODO we need it?
         });
-        draw(data);
+        draw(data["data"]);
     });
     
     function draw(t) {
@@ -151,7 +153,8 @@ function prepare_flow_chart(){
             if (hours) {
                 output = hours + 'h ' + output;
             }
-            return output;
+            //return output;
+            return new Date( starting_time + (d*1000) )
         };
         
         var margins = {top: 40.5,right: 35.5,bottom: 40.5,left: 65.5}, 
@@ -169,7 +172,7 @@ function prepare_flow_chart(){
         }), p = d3.select("#graphic").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")");
         /* draw horizontal lines */p.append("defs").append("marker").attr("id", "arrowhead").attr("viewBox", "-.1 -5 10 10").attr("orient", "auto").attr("markerWidth", 3).attr("markerHeight", 3).append("path").attr("d", "M-.1,-4L3.9,0L-.1,4"), p.append("g").attr("class", "axis axis--minor").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(l).orient("right").tickSize(-s).ticks(d3.time.year)).selectAll(".tick").attr("class", function(e) {
             return "tick tick--" + (1984 === e.getFullYear() ? 1984 : e.getFullYear() % 10 ? "minor" : "major") //in 1984 draws a marker
-        }), p.append("g").attr("class", "axis axis--major").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(x_domain).orient("right").tickFormat(formatMinutes).tickValues(d3.range(0, 3600, 200))), p.append("g").attr("class", "axis axis--major").call(d3.svg.axis().scale(l).orient("left").tickValues(l.ticks(d3.time.year, 50).concat(l.domain())));
+        }), p.append("g").attr("class", "axis axis--major").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(x_domain).orient("right").tickFormat(formatMinutes).tickValues(d3.range(0, 3600, 100))), p.append("g").attr("class", "axis axis--major").call(d3.svg.axis().scale(l).orient("left").tickValues(l.ticks(d3.time.year, 50).concat(l.domain())));
         var u = d3.select("#overlay").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")"), h = d3.select("#graphic-subtitle").append("svg").style("position", "absolute").style("margin-top", "-5px").attr("height", 30).attr("width", 30), f = h.append("g").attr("class", "school school--switch"), y = f.append("linearGradient").attr("id", "school-switch-gradient-key").attr("y1", "100%").attr("y2", "0%").attr("x1", 0).attr("x2", 0);
         y.append("stop").attr("offset", "0%").attr("stop-color", "#d7d7d7"), y.append("stop").attr("offset", "100%").attr("stop-color", "#d7d7d7"), f.append("path").attr("d", "M" + e(1)([[10, 22], [20, 8]])).style("stroke", "url(#school-switch-gradient-key)"), /* TODO delete gradient if not needed*/
         !function(t) {

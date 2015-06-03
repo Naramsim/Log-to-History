@@ -178,23 +178,22 @@ def get_user_story():
             os.makedirs("data")
 
         if to_render == 0:
-            #CREATE JSON for Tree
+            #CREATES JSON for Tree Graph
             JSON_to_write = json.dumps( story, sort_keys=False)
             file_ = open('data/tree.json', 'w')
             file_.write(JSON_to_write)
             file_.close()
         if to_render == 1:
-            # CREATE JSON for Chart
-            stack_json = {}
-            stack_json["start_time"] = int(first_request_time.strftime("%s")) * 1000
-            stack_json["data"] = tsv_list
-            JSON_to_write = json.dumps( tsv_list, sort_keys=False)
-            #print tsv_list
+            # CREATES JSON for Flow Chart
+            flow_json = {}
+            flow_json["start_time"] = int(first_request_time.strftime("%s")) * 1000
+            flow_json["data"] = tsv_list
+            JSON_to_write = json.dumps( flow_json, sort_keys=False)
             file_ = open('data/flow.json', 'w')
             file_.write(JSON_to_write)
             file_.close()
         if to_render == 2:
-            # CREATE JSON for Stack Chart
+            # CREATES JSON for Stack Chart
             stack_json = {}
             stack_json["start_time"] = int(first_request_time.strftime("%s")) * 1000
             stack_json["data"] = tsv_list

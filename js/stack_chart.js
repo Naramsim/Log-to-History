@@ -120,7 +120,7 @@ function prepare_stack(){
     nv.addGraph(function() {
         chart = nv.models.stackedAreaChart()
             .useInteractiveGuideline(true)
-            .x(function(d) {/*console.log(d[0]);*/ return new Date(d[0] + data["start_time"] - 3600000) })//convert to local timestamp
+            .x(function(d) {/*console.log(d[0]);*/ return new Date( (d[0]*1000) + data["start_time"] - 3600000) })//convert to local timestamp
             .y(function(d) { return d[1]; })
             .controlLabels({stacked: "Stacked"})
             .color(keyColor)
