@@ -1,0 +1,107 @@
+#header {
+    position: fixed;
+    top:0;
+    width: 100%;
+    height:90px;
+    background-color: white;
+    z-index: 20;
+}
+
+#logo {
+    position: fixed;
+    top: 17px;
+    left: 100px;
+    fill: red;
+    content:url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgYmFzZVByb2ZpbGU9InRpbnkiIGhlaWdodD0iMjRweCIgdmVyc2lvbj0iMS4yIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIyNHB4IiB4bWw6c3BhY2U9InByZXNlcnZlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZyBpZD0iTGF5ZXJfMSI+PGc+PHBhdGggZD0iTTgsMTYuMTg0VjE1LjVjMC0wLjg0OCwwLjUxMi0xLjU5NSwxLjI4Ny0yLjA0N2MtMC42NjctMC4yODItMS4yNzktMC42NjctMS44MjItMS4xMzFDNi41NjEsMTMuMTM2LDYsMTQuMjYsNiwxNS41djAuNjg0ICAgIEM0LjgzOSwxNi41OTksNCwxNy42OTgsNCwxOWMwLDEuNjU0LDEuMzQ2LDMsMywzczMtMS4zNDYsMy0zQzEwLDE3LjY5OCw5LjE2MSwxNi41OTksOCwxNi4xODR6IE03LDIwYy0wLjU1MiwwLTEtMC40NDktMS0xICAgIHMwLjQ0OC0xLDEtMXMxLDAuNDQ5LDEsMVM3LjU1MiwyMCw3LDIweiIvPjxwYXRoIGQ9Ik0xNiw3LjgxNXYwLjM1MWMwLDAuOTg1LTAuNTM1LDEuODUyLTEuMzQ1LDIuMzZjMC42NjUsMC4yNzQsMS4yNzksMC42NDYsMS44MjMsMS4xQzE3LjQxNCwxMC43NDgsMTgsOS41MjQsMTgsOC4xNjcgICAgVjcuODE2QzE5LjE2MSw3LjQwMSwyMCw2LjMwMiwyMCw1YzAtMS42NTQtMS4zNDYtMy0zLTNzLTMsMS4zNDYtMywzQzE0LDYuMzAyLDE0LjgzOSw3LjQwMSwxNiw3LjgxNXogTTE3LDRjMC41NTIsMCwxLDAuNDQ5LDEsMSAgICBzLTAuNDQ4LDEtMSwxcy0xLTAuNDQ5LTEtMVMxNi40NDgsNCwxNyw0eiIvPjxwYXRoIGQ9Ik0xNy45MzUsMTYuMTY0QzE3LjUyNSwxMy4yNTEsMTUuMDI0LDExLDEyLDExYy0xLjkzNiwwLTMuNTUyLTEuMzgxLTMuOTItMy4yMDlDOS4yLDcuMzU1LDEwLDYuMjcyLDEwLDUgICAgYzAtMS42NTQtMS4zNDYtMy0zLTNTNCwzLjM0Niw0LDVjMCwxLjMyNiwwLjg3LDIuNDQsMi4wNjUsMi44MzZDNi40NzUsMTAuNzQ5LDguOTc2LDEzLDEyLDEzYzEuOTM2LDAsMy41NTIsMS4zODEsMy45MiwzLjIwOSAgICBDMTQuOCwxNi42NDUsMTQsMTcuNzI4LDE0LDE5YzAsMS42NTQsMS4zNDYsMywzLDNzMy0xLjM0NiwzLTNDMjAsMTcuNjc0LDE5LjEzLDE2LjU2LDE3LjkzNSwxNi4xNjR6IE03LDRjMC41NTIsMCwxLDAuNDQ5LDEsMSAgICBTNy41NTIsNiw3LDZTNiw1LjU1MSw2LDVTNi40NDgsNCw3LDR6IE0xNywyMGMtMC41NTIsMC0xLTAuNDQ5LTEtMXMwLjQ0OC0xLDEtMXMxLDAuNDQ5LDEsMVMxNy41NTIsMjAsMTcsMjB6Ii8+PC9nPjwvZz48L3N2Zz4='); 
+}
+
+#search {
+    width: 240px;
+    float: right;
+    margin-right: 210;
+    /*
+    right: 0;
+    position: absolute;
+    top: -30px;*/
+}
+
+#graphic-title-and-subtitle {
+    margin-left: 210;
+    /*
+    position: absolute;
+    top: -32px;*/
+}
+
+#graphic-title {
+    font: 700 17px/1.6em "nyt-franklin", sans-serif;
+}
+
+#graphic-subtitle {
+    font: 300 15px "nyt-franklin", sans-serif;
+    display: inline-block;
+}
+
+.input-append {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#submit {
+    margin-bottom: 5px;
+}
+
+#explanation {
+    display: inline-block;
+}
+
+#submit, #explanation, .input-append {
+    margin-left: 30px;
+}
+
+#loader {
+    display: inline-block;
+    float: right;
+    margin-right: 30px;
+}
+
+.loader {
+    
+    line-height: 29px;
+    font-size: 2px;
+    text-indent: -9999em;
+    border-top: 1.1em solid rgba(235, 235, 235, 0.2);
+    border-right: 1.1em solid rgba(235, 235, 235, 0.2);
+    border-bottom: 1.1em solid rgba(235, 235, 235, 0.2);
+    border-left: 1.1em solid #2CC185;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-animation: load8 1.1s infinite linear;
+    animation: load8 1.1s infinite linear;
+}
+.loader,
+.loader:after {
+    border-radius: 50%;
+    width: 10em;
+    height: 10em;
+}
+@-webkit-keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}

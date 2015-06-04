@@ -50,6 +50,7 @@ function prepare_graph(){
 
     root.children.forEach(collapse);
     update(root);
+    end_spinner();
   });
 
   d3.select(self.frameElement).style("height", "800px");

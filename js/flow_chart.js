@@ -386,7 +386,8 @@ function prepare_flow_chart(){
                 f(null), y(e.point.school.name), d3.event.stopPropagation()
             }), d3.select(window).on("click", function() {
                 y(null)
-            })
+            });
+            end_spinner();
         }(data);
     }
 };

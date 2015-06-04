@@ -11,13 +11,14 @@
 */
 
 function prepare_stack(){
+  $("#chart").empty();
 
   var colors = d3.scale.category20();
   var keyColor = function(d, i) {return colors(d.key)};
   var chart;
   var regInteger = /^\d+$/;
   var max=0, min=0;
-  var time_interval = 10;//seconds
+  var time_interval = 30;//seconds
   var data_folders = []
   function isInteger( str ) {
     /*regex that checks if string can be considered as int interger*/
@@ -129,7 +130,7 @@ function prepare_stack(){
         chart.xAxis.tickFormat(function(d) {return d3.time.format('%H:%M:%S')(new Date(d)) });
         
         chart.yAxis.tickFormat(d3.format(',.2f'));
-        d3.select('#chart1')
+        d3.select('#chart')
             .datum(datam)
             .transition().duration(1000)
             .call(chart)
@@ -142,6 +143,7 @@ function prepare_stack(){
                 }, 0)
             });
         nv.utils.windowResize(chart.update);
+        end_spinner();
         return chart;
     });
   });
