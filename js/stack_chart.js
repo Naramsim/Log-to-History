@@ -42,6 +42,7 @@ function prepare_stack(){
   }
   function createIntervalTable() {
       times_array = []; //array with all intervals
+      console.log(max)
       for (var i=min; i<max; i+=time_interval){ //building this array
           times_array.push([ i, 0 ]);
       }
@@ -58,7 +59,7 @@ function prepare_stack(){
   					if(typeof entry[key] !== "undefined"){ //TODO: collapse ifs
   					  if(entry[key] != ""){
   					      pages.add(entry[key]);
-  					      if(+key > max) max = key; //finds maximum time-value
+  					      if(+key > max) max = +key; //finds maximum time-value
   					  }
   					}
   				}
@@ -66,6 +67,14 @@ function prepare_stack(){
         }
     });
     pages.delete("");
+
+    // calculates best time_interval
+    if (data["interval_processed"] > 86400){
+      time_interval = +((data["interval_processed"]/180).toFixed(0))
+    }else{
+      time_interval = +((data["interval_processed"]/360).toFixed(0))
+    }
+    console.log(time_interval)
     
     pages.forEach(function(entry){
       folder_object = new Object();
@@ -109,13 +118,10 @@ function prepare_stack(){
                   return true;
               }
           })
-          /*console.log(key)
-          console.log(next_item)
-          console.log("---")*/
         }
       }
     });
-    //console.log(data_folders);
+
     datam = JSON.parse(JSON.stringify(data_folders))
 
     nv.addGraph(function() {
