@@ -91,9 +91,16 @@ function prepare_stack(){
 
     //filling each time interval with the proper value
     data["data"].forEach(function(entry){
+      var entry_sorted_keys = Object.keys(entry).sort( function(a,b) { //sorting object elements for fast access to the next element
+          return +b - +a; //desc ordering
+      });
+      //console.log(entry_sorted_keys)
       for (var key in entry) {
         if (entry.hasOwnProperty(key) && isInteger(key) && typeof entry[key] !== "undefined" && entry[key] != ""){
-          next_item = findClosest(entry, key, true)
+          var current_key_index =  entry_sorted_keys.indexOf(key);
+          next_item = current_key_index > 0 ?  entry_sorted_keys[current_key_index -1] : false
+          //next_item_ = findClosest(entry, key, true)
+          //console.log(next_item + " "+ next_item_)
           folder = entry[key]
           //console.log(data_folders[folder_index[folder]]["values"])
           has_started = false;
