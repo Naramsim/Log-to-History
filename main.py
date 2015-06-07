@@ -25,11 +25,13 @@ with open('config.json') as data_file: #loads configuration
 
 to_render = -1
 if len(sys.argv) > 1:
-    start_point = time.strptime(sys.argv[1], '%d/%m/%Y@%H:%M:%S')
-    end_point = time.strptime(sys.argv[2], '%d/%m/%Y@%H:%M:%S')
+    start_point = datetime.datetime.strptime(sys.argv[1], '%d/%m/%Y@%H:%M:%S')
+    #start_point_ = time.strptime(sys.argv[1], '%d/%m/%Y@%H:%M:%S')
+    end_point = datetime.datetime.strptime(sys.argv[2], '%d/%m/%Y@%H:%M:%S')
+    #end_point_ = time.strptime(sys.argv[2], '%d/%m/%Y@%H:%M:%S')
     to_render = sys.argv[3]
 else: # default: 1 hour ago
-    import datetime
+    import datetime #TODO make datetime from time struct
     start_point = datetime.datetime.now().timetuple()
     end_point = datetime.datetime.now() - datetime.timedelta(hours=1)
     end_point = end_point.timetuple()
@@ -41,7 +43,7 @@ filters = config["whitelist_extensions"] #extensions of pages that we want to tr
 black_folders = config["blacklist_folders"]
 depth = config["folder_level"]
 
-
+#@profile
 def get_user_story():
     '''
     analyzes a log file and creates two files, one needed by index.php, the other one by flow.php
@@ -74,7 +76,6 @@ def get_user_story():
         IPs = [] # list of processed IPs
         IP_index = 0 # unuseful
         
-        
         #data structures needed for accesslog.json
         story = {} #dict of lists of dicts, this structure will be transfomed in the JSON file needed by index.php
         story["name"] = "root_log" # root of the three
@@ -93,85 +94,78 @@ def get_user_story():
         requests = get_requests() #list with all lines of the access log
 
         for req in requests:
-            
-            request_time = time.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call loses the time zone, but it is quicker than dateutil
-            if ( start_point <= request_time <= end_point ) and ( not any(black in req[2] for black in black_folders ) ):
-                if ( any(x in req[2] for x in filters) or (req[2].endswith('/')) or (('.') not in req[2]) ): #if page requested is contained in filters or it is a folder
-                    
-                    IP_index_list = [n for n,el in enumerate(story["children"]) if el["name"] == req[0]]  # IP_index_list is a one-value list, it contains the index of the IP that we are processing
-                    # IF IP ALREADY PROCESSED ONCE
-                    if req[0] in IPs:
-                        is_ip_new = False
-                        IP_index = IP_index_list[0] # index of processing IP in story["children"]
-                    # IF IP IS NEW
-                    else:
-                        is_ip_new = True
-                        IPs.append(req[0]) #now it is no more a new IP
-                        ip_dict = {} # this dict contains all information about a visit performed by a user, the IP, the User-Agent, the time, visited pages by him, number of his hits, if it is a spider or not
-                        ip_dict["name"] = req[0] 
-                        ip_dict["UA"] = req[6]
-                        ip_dict["datetime"] = req[1]
-                        ip_dict["children"] = []
-                        ip_dict["count"] = 0
-                        ip_dict["is_bot"] = check_bot(req)
-                        story["children"].append(ip_dict)
-                        IP_index = len(story["children"]) - 1
+            if to_render == 0:
+                IP_index_list = [n for n,el in enumerate(story["children"]) if el["name"] == req[0]]  # IP_index_list is a one-value list, it contains the index of the IP that we are processing #OPTIMIZE
+            # IF IP ALREADY PROCESSED ONCE
+            if req[0] in IPs:
+                is_ip_new = False
+                if to_render == 0:
+                    IP_index = IP_index_list[0] # index of processing IP in story["children"]
+            # IF IP IS NEW
+            else:
+                is_ip_new = True
+                IPs.append(req[0]) #now it is no more a new IP
+                if to_render == 0:
+                    ip_dict = {} # this dict contains all information about a visit performed by a user, the IP, the User-Agent, the time, visited pages by him, number of his hits, if it is a spider or not
+                    ip_dict["name"] = req[0] 
+                    ip_dict["UA"] = req[6]
+                    ip_dict["datetime"] = req[1]
+                    ip_dict["children"] = []
+                    ip_dict["count"] = 0
+                    ip_dict["is_bot"] = check_bot(req)
+                    story["children"].append(ip_dict)
+                    IP_index = len(story["children"]) - 1
 
-                    if to_render == 0:
-                        # preparing JSON tree
-                        story["children"][IP_index]["count"] += 1
-                        if my_site not in req[5] :   # if referrer is not defined or come from another site, I create a new first-level node
-                            story["children"][IP_index]["children"].append({"name":req[2], "ref":req[5], "children":[], "datetime":req[1]}) #, "children":[]
-                        else:	#if not, i try to chain it
-                            attach_node( story["children"][IP_index]["children"], req )
-                    if to_render > 0:
-                        #preparing TSV flow-chart and JSON stack
-                        tsv_dict = OrderedDict() #dict used to store the number(name) of an IP, pages visited by him and time of the visits
-                        full_data = parser.parse(req[1],fuzzy=True)
-                        
-                        folder_requested = get_folder(req[2])
-
-                        if not tsv_list:
-                            first_request_time = full_data
-                        
-                        #print full_data
-                        #print first_request_time
-                        time_elapsed_since_first = (full_data - first_request_time).seconds + ((full_data - first_request_time).days * 86400) #seconds elapsed since first request found in the accesslog
-                        hours.append(time_elapsed_since_first)
-                        if is_ip_new:
-                            tsv_dict["name"] = req[0]
-                            tsv_dict["team"] = req[0]
-                            tsv_dict[time_elapsed_since_first] = folder_requested # key:time value:folder_requested
-                            tsv_list.append(tsv_dict)
-                        else:
-                            current_dict = search_in_list(req[0],tsv_list) #selects the dict of a specified IP
-                            last_key = next(reversed(current_dict)) # gets last element(greater time)
-                            if my_site in req[5]: #if the referrer comes from our site
-                                referrer_folder = get_folder( re.sub('^'+protocol+my_site, '', req[5]) ) 
-                                if (current_dict[last_key] != referrer_folder) and (referrer_folder != folder_requested) and (not (+time_elapsed_since_first-2 < +last_key)): #if referrer is not equal to the last element
-                                    if not any(black in referrer_folder for black in black_folders ): # and not in black list
-                                        mean = (+last_key + +time_elapsed_since_first)/2 
-                                        current_dict[mean] = referrer_folder # it adds the referrer folder 
-                            current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
+            if to_render == 0:
+                # preparing JSON tree
+                story["children"][IP_index]["count"] += 1
+                if my_site not in req[5] :   # if referrer is not defined or come from another site, I create a new first-level node
+                    story["children"][IP_index]["children"].append({"name":req[2], "ref":req[5], "children":[], "datetime":req[1]}) #, "children":[]
+                else:   #if not, i try to chain it
+                    attach_node( story["children"][IP_index]["children"], req )
+            if to_render > 0:
+                #preparing TSV flow-chart and JSON stack
+                tsv_dict = OrderedDict() #dict used to store the number(name) of an IP, pages visited by him and time of the visits
+                full_data = parser.parse(req[1],fuzzy=True) #=datetime.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') #OPTIMIZE
+                folder_requested = get_folder(req[2])
+                if not tsv_list:
+                    first_request_time = full_data
+                time_elapsed_since_first = (full_data - first_request_time).seconds + ((full_data - first_request_time).days * 86400) #seconds elapsed since first request found in the accesslog
+                hours.append(time_elapsed_since_first)
+                if is_ip_new:
+                    tsv_dict["name"] = req[0]
+                    tsv_dict["team"] = req[0]
+                    tsv_dict[time_elapsed_since_first] = folder_requested # key:time value:folder_requested
+                    tsv_list.append(tsv_dict)
+                else:
+                    current_dict = search_in_list(req[0],tsv_list) #selects the dict of a specified IP #OPTIMIZE
+                    last_key = next(reversed(current_dict)) # gets last element(greater time)
+                    if my_site in req[5]: #if the referrer comes from our site
+                        referrer_folder = get_folder( re.sub('^'+protocol+my_site, '', req[5]) ) 
+                        if (current_dict[last_key] != referrer_folder) and (referrer_folder != folder_requested) and (not (+time_elapsed_since_first-2 < +last_key)): #if referrer is not equal to the last element
+                            if not any(black in referrer_folder for black in black_folders ): # and not in black list
+                                mean = (+last_key + +time_elapsed_since_first)/2 
+                                current_dict[mean] = referrer_folder # it adds the referrer folder 
+                    current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
 
 
-                    # preparing JSON stack chart
-                    '''if folder_requested not in all_folders:
-                        all_folders.append(folder_requested)
-                        folder_dict = {}
-                        folder_dict["key"]= folder_requested
-                        folder_dict["values"] = []
-                        stack_list.append(folder_dict)
+            # preparing JSON stack chart
+            '''if folder_requested not in all_folders:
+                all_folders.append(folder_requested)
+                folder_dict = {}
+                folder_dict["key"]= folder_requested
+                folder_dict["values"] = []
+                stack_list.append(folder_dict)
 
-                    if end_interval == -1: #todo change tsv_list
-                        end_interval = first_request_time + datetime.timedelta(seconds=scanning_interval) #10 seconds interval
-                    if full_data <= end_interval:
-                        for folder in stack_list:
-                            new_time = [end_interval - scanning_interval , 0]
-                            folder["values"].append(new_time)
-                    else:
-                        end_interval = end_interval + datetime.timedelta(seconds=scanning_interval)
-                        #todo add the element'''
+            if end_interval == -1: #todo change tsv_list
+                end_interval = first_request_time + datetime.timedelta(seconds=scanning_interval) #10 seconds interval
+            if full_data <= end_interval:
+                for folder in stack_list:
+                    new_time = [end_interval - scanning_interval , 0]
+                    folder["values"].append(new_time)
+            else:
+                end_interval = end_interval + datetime.timedelta(seconds=scanning_interval)
+                #todo add the element'''
 
                     
         if not os.path.exists("data"):
@@ -259,6 +253,17 @@ def get_folder(url):
         folder += "/" + token[count]
     return folder
 
+month_map = {'Jan': 1, 'Feb': 2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7, 
+    'Aug':8,  'Sep': 9, 'Oct':10, 'Nov': 11, 'Dec': 12}
+
+def apachetime(s):
+    '''
+    method that parses 10 times faster dates using slicing instead of regexs
+    '''
+    return datetime.datetime(int(s[7:11]), month_map[s[3:6]], int(s[0:2]), \
+         int(s[12:14]), int(s[15:17]), int(s[18:20]))
+
+#@profile
 def get_requests():
     '''
     method that creates a list containing all requests done on a site
@@ -278,7 +283,11 @@ def get_requests():
             compiled_line = find(pat, line, None)
             if compiled_line:
                 compiled_line = compiled_line[0] # convert our [("","","")] to ("","","")
-                request_time = time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call loses the time zone, but it is quicker than using dateutil
+                request_time = apachetime(compiled_line[1])
+                #request_time_ = time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call loses the time zone, but it is quicker than using dateutil
+                #print request_time
+                #print request_time_
+                #print "--"
                 if ( start_point <= request_time <= end_point ) and ( not any(black in compiled_line[2] for black in black_folders ) ):
                     if ( any(x in compiled_line[2] for x in filters) or (compiled_line[2].endswith('/')) or (('.') not in compiled_line[2]) ):
                         requests.append(compiled_line)
