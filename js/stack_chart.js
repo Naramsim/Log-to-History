@@ -140,9 +140,10 @@ function prepare_stack(){
             .color(keyColor)
             .duration(300);
         //chart.xScale = d3.time.scale();
-        chart.xAxis.tickFormat(function(d) {return d3.time.format('%H:%M:%S')(new Date(d)) });
+        chart.xAxis.axisLabel('Time').rotateLabels(25).tickFormat(function(d) {return d3.time.format('%e/%m %H:%M:%S')(new Date(d)) });
         
-        chart.yAxis.tickFormat(d3.format(',.2f'));
+        chart.yAxis.axisLabel('Visitors');
+        chart.yAxisTickFormat(d3.format(',.0d'));
         d3.select('#chart')
             .datum(datam)
             .transition().duration(1000)

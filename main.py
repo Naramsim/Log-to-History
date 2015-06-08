@@ -86,12 +86,10 @@ def get_user_story():
         hours = [] #list that contains every hour while there was a page request, these hours will be keys(first row) of our tsv file
         hour_changed = False #boolean needed to understand if the hour has changed, i.e.: from 10.57 to 11.01
 
-        #data structures needed for stack.json
-        '''stack_list = []
-        all_folders = []
-        end_interval = -1'''
-
         requests = get_requests() #list with all lines of the access log
+        if len(requests)>4000 and to_render<2:
+            print "fail"
+            sys.exit(0)
 
         for req in requests:
             if to_render == 0:
@@ -198,8 +196,9 @@ def get_user_story():
             file_.close()
 
     except Exception as ex:
+        print "fail"
         print( "[" + str(format( sys.exc_info()[-1].tb_lineno )) + "]: " + str(ex) )    # error line and exception
-        exit(1)
+        sys.exit(1)
 
 
 def attach_node(current_node, req):
@@ -215,7 +214,6 @@ def attach_node(current_node, req):
     elif not ref_index_list: #if we have not found the referrer maybe it is in a son
         for element in current_node:    #for every son, do:
             attach_node(element["children"] , req)
-
 
 def check_bot(request):
     '''

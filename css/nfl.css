@@ -30,6 +30,10 @@ a:hover {
     left: 0;
 }
 
+#graphic>svg {
+    overflow: visible;
+}
+
 .annotation {
     color: #444;
     font: 500 13px/1.2em "nyt-franklin", sans-serif;

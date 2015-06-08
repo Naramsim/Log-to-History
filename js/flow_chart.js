@@ -86,12 +86,19 @@ function prepare_flow_chart(){
         data["data"].forEach(function(entry) { //every entry is an object that represents which folder was seeing a user in a certain time
         	var keys = []; 
         	var entries = [];
+            var entry_sorted_keys = Object.keys(entry).sort( function(a,b) { //sorting object elements for fast access to the next element
+                return +b - +a; //desc ordering
+            });
+            entry_length = entry_sorted_keys.length;
             for (var key in entry) { //every object key-value is configured like this-> key:time value:folder_visited
                 if (entry[key]!="" && entry[key]!==undefined && isInteger(key) ){ //if we find a ""(empty string), it means that the user did not changed the folder, it is in the same folder before
                 	keys.push(key)
                 	entries.push(entry[key])
-                    previous_item = findClosest(entry,key,false); //finds the previous and next element relatives to the current key
-                    next_item = findClosest(entry,key,true);
+                    var current_key_index =  entry_sorted_keys.indexOf(key);
+                    next_item = current_key_index > 0 ?  entry_sorted_keys[current_key_index -1] : false
+                    previous_item = current_key_index < entry_length-3 ?  entry_sorted_keys[current_key_index +1] : false
+                    //previous_item_ = findClosest(entry,key,false); //finds the previous and next element relatives to the current key
+                    //next_item_ = findClosest(entry,key,true);
                     if (previous_item && next_item){ 
                         previous_item = previous_item + 1; // this is the second after the user has changed folder
                         next_item = next_item - 1; // this is the second before the user has changed folder //TODO:check if previous or next is the same page
@@ -143,18 +150,8 @@ function prepare_flow_chart(){
     	var formatCount = d3.format(",.0f"),
         formatTime = d3.time.format("%Mm %Ss"),
         formatMinutes = function(d) { 
-            var hours = Math.floor(d / 3600),
-                minutes = Math.floor((d - (hours * 3600)) / 60),
-                seconds = d - (minutes * 60);
-            var output = seconds + 's';
-            if (minutes) {
-                output = minutes + 'm ' + output;
-            }
-            if (hours) {
-                output = hours + 'h ' + output;
-            }
-            //return output;
-            return new Date( starting_time + (d*1000) )
+            var format_left = d3.time.format("%e/%m %H:%M:%S");
+            return format_left(new Date( starting_time + (d*1000) ));
         };
         
         var margins = {top: 40.5,right: 35.5,bottom: 40.5,left: 65.5}, 
@@ -369,7 +366,7 @@ function prepare_flow_chart(){
             })/*, p.append("line").attr("class", "annotation-line").attr("x1", 865).attr("y1", 25).attr("x2", 890).attr("y2", 25), p.append("line").attr("class", "annotation-line").attr("x1", 855).attr("y1", 428).attr("x2", 975).attr("y2", 428), p.append("line").attr("class", "annotation-line").attr("x1", 185).attr("y1", 1320).attr("x2", 185).attr("y2", 1370);*/
             
             var B = u.append("g").attr("class", "tooltip").style("display", "none"), j = B.append("path"), M = B.append("text").attr("dy", ".35em").attr("x", 10);
-            u.append("g").attr("class", "voronoi").selectAll("path").data(d3.geom.voronoi().y(function(e) {
+            /*u.append("g").attr("class", "voronoi").selectAll("path").data(d3.geom.voronoi().y(function(e) {
                 return l(e.date)
             }).x(function(e) {
                 return c(e.y)
@@ -386,7 +383,7 @@ function prepare_flow_chart(){
                 f(null), y(e.point.school.name), d3.event.stopPropagation()
             }), d3.select(window).on("click", function() {
                 y(null)
-            });
+            });*/
             end_spinner();
         }(data);
     }
