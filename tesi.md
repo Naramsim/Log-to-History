@@ -3,7 +3,8 @@
 
 Indice
 
-[TOC]
+ecco un [link].
+[link]: https://github.com
 
 
 
