@@ -12,7 +12,7 @@ I tre grafici hanno i seguenti nomi: tree, flow e stack.
 Tree mostra un albero che si sviluppa lateralmente, esso fa combaciare ad ogni visitatore un set di pagine che sono state visualizzate _direttamente_ dall'utente, direttamente significa che l'utente proviene da un altro sito, come Google, Bing e altri, o che ha caricato il sito dalla barra degli indirizzi del Browser. Ogni visita diretta è dunque rappresentata da un nodo, che ha come figli le pagine visitate dall'utente che ha cliccato su un link del sito che si sta analizzando. Questo grafico rappresenta la cronologia di un utente calcolata secondo i movimenti via link. Passando sopra ad ogni nodo che identifica un visitatore si può vedere l'user agent, se è identificato come un bot o un crawler il nodo verrà colorato di giallo. Mentre se si passa sopra una pagina visitata da un utente comparirà la data della visita.
 
 ### Flow
-Flow è un diagramma di flusso che sviluppa verticalmente, il suo scopo è quello di mostrare i cambiamenti di pagina di un utente. In Flow ci sono tante colonne quante cartelle ci sono su un sito, all'interno di queste colonne sono rappresentati i visitatori come linee verticali, quando una linea cambia colonna significa che il visitatore ha cambiato pagina durante la sua navigazione. E' bene precisare che l'analisi in questo grafico non comprende tutte le pagine di un sito ma solo le cartelle dove sono residenti le pagine web. Questo significa che se un visitatore è sulla pagina [http://sito/cartella/index.html](http://sito/cartella/index.html "URL della pagina"), il grafico mostrerà l'utente come se stesse visitando [cartella/](http://sito/cartella/ "Cartella dove risiede la pagina web"). Si ha quindi una generalizzazione di cosa i visitatori stanno navigando. E' presente pure una casella di ricerca in cui si può cercare ed evidenziare un certo visitatore. 
+Flow è un diagramma di flusso che sviluppa verticalmente, il suo scopo è quello di mostrare i cambiamenti di pagina di un utente. In Flow ci sono tante colonne quante cartelle ci sono su un sito, all'interno di queste colonne sono rappresentati i visitatori come linee verticali, quando una linea cambia colonna significa che il visitatore ha cambiato pagina durante la sua navigazione. E' bene precisare che l'analisi in questo grafico non comprende tutte le pagine di un sito ma solo le cartelle dove sono residenti le pagine web. Questo significa che se un visitatore è sulla pagina _http://sito/cartella/index.html_, il grafico mostrerà l'utente come se stesse visitando _cartella/_. Si ha quindi una generalizzazione di cosa i visitatori stanno navigando. E' presente pure una casella di ricerca in cui si può cercare ed evidenziare un certo visitatore. 
 
 ### Stack
 Stack è un grafico che si concentra sulle visite non tenendo conto di chi ha fatto la visita. E' l'unico grafico che si discosta dagli altri. Esso mostra un grafico ad aree sovrapposte, ogni area di colore diverso rappresenta il quantitativo di visite su una determinata cartella nel tempo. Anche questo grafico usa le cartelle al posto delle singole pagine web, per non essere troppo particolareggiato ma più generale possibile. La sovrapposizione delle varie aree permette inoltre di visualizzare anche il numero complessivo di utenti su tutto il sito in un dato istante. Sono presenti dei controlli nella parte superiore del grafico, a destra viene permesso di passare fra il quantitativo di visite alla percentuale delle visite cliccando il pulsante "expanded", mentre se viene premuto "stream" i dati verranno organizzati attorno all'asse x e non solo al di sopra, creando un grafico organico e di flusso.
@@ -47,7 +47,7 @@ Come seconda cosa lo script esegue `get_requests()` e apre il file di log, lo le
 Viene poi eseguito anche un controllo per evitare di passare al browser un file troppo lungo: se viene richiesto flow o tree e il numero di accessi è troppo alto per essere renderizzato da un browser viene lanciato un errore e il programma si ferma. 
 Dopo la fase preparativa avviene la vera e propria costruzione del file da passare al browser, un file JSON. Per stack e flow questo file è molto simile, mentre per tree è totalmente diverso.
 Il JSON che viene sviluppato per tree è di questa forma:
-```
+```json
 {
  "name": "root",
  "children": [
@@ -68,7 +68,7 @@ Il JSON che viene sviluppato per tree è di questa forma:
 
 viene creato un primo livello con tutti gli indirizzi IP(i visitatori del sito). Mentre si costruisce questo primo livello vengono appese le varie visite effettuate ad un certo IP, le visite dirette sono figlie primogenite dell'indirizzo IP, mentre quelle che vengono dal sito stesso(ad esempio cliccando su un link) vengono appese alla visita precedente tramite una funzione ricorsiva: `attach_node()`.
 Differentemente da tree, stack e flow hanno bisogno di un file JSON con struttura diversa:
-```
+```json
 {
     start_time: 1427665171000,
     data: [
@@ -91,7 +91,7 @@ E' bene ora fare un piccolo esempio, supponiamo di avere due linee di log così 
 145.50.30.131 - [10/Mar/2015:13:55:56 -0100] "GET /fourth.html HTTP/1.1" 200 2136 "http://www.site.com/first.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"
 ```
 Il JSON sarà realizzato così:
-```
+```json
 {
     start_time: ...,
     data: [
