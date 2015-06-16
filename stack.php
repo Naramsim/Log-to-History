@@ -63,8 +63,8 @@ comments
           });
         })();
         </script>
-        <div style="position:absolute;top:90px;width:100%;height:80%;">
-            <svg id="chart"></svg>
+        <div style="position:absolute;top:90px;width:97%;height:80%;">
+            <svg id="chart" style="overflow:visible"></svg>
         </div>
     </body>
 </html>

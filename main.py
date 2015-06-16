@@ -242,7 +242,9 @@ def get_folder(url):
     '''
     token = url.split("/")
     folder = ""
-    #print depth
+    print token
+    if "." in token[-1]:
+        token[-1] = ''
     if (len(token) <= depth) and (depth>0):
         current_depth = len(token) - 1
     else:
