@@ -1,12 +1,6 @@
 # Log to History
 
 
-Indice
-
-ecco un [link].
-[link]: https://github.com
-
-
 
 ## Introduzione
 
