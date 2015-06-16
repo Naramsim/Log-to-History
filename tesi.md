@@ -47,7 +47,7 @@ Come seconda cosa lo script esegue `get_requests()` e apre il file di log, lo le
 Viene poi eseguito anche un controllo per evitare di passare al browser un file troppo lungo: se viene richiesto flow o tree e il numero di accessi è troppo alto per essere renderizzato da un browser viene lanciato un errore e il programma si ferma. 
 Dopo la fase preparativa avviene la vera e propria costruzione del file da passare al browser, un file JSON. Per stack e flow questo file è molto simile, mentre per tree è totalmente diverso.
 Il JSON che viene sviluppato per tree è di questa forma:
-```json
+```
 {
  "name": "root",
  "children": [
@@ -68,7 +68,7 @@ Il JSON che viene sviluppato per tree è di questa forma:
 
 viene creato un primo livello con tutti gli indirizzi IP(i visitatori del sito). Mentre si costruisce questo primo livello vengono appese le varie visite effettuate ad un certo IP, le visite dirette sono figlie primogenite dell'indirizzo IP, mentre quelle che vengono dal sito stesso(ad esempio cliccando su un link) vengono appese alla visita precedente tramite una funzione ricorsiva: `attach_node()`.
 Differentemente da tree, stack e flow hanno bisogno di un file JSON con struttura diversa:
-```json
+```
 {
     start_time: 1427665171000,
     data: [
@@ -91,7 +91,7 @@ E' bene ora fare un piccolo esempio, supponiamo di avere due linee di log così 
 145.50.30.131 - [10/Mar/2015:13:55:56 -0100] "GET /fourth.html HTTP/1.1" 200 2136 "http://www.site.com/first.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"
 ```
 Il JSON sarà realizzato così:
-```json
+```
 {
     start_time: ...,
     data: [
