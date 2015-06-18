@@ -12,7 +12,7 @@
 ?>
 <html>
 <!--
-comments
+Stack chart is a chart which shows among the time the different portions of users on all the folders of a site.
 -->
     <head>
         <link href="css/header.css" rel="stylesheet" >
@@ -51,7 +51,7 @@ comments
           var template;
 
           $.ajax({
-            url: "templates/head.handlebars", //ex. js/templates/mytemplate.handlebars
+            url: "templates/head.handlebars", 
               //cache: true,
               success: function(data) {
                 source    = data;

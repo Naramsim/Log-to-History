@@ -11,7 +11,7 @@
 */
 
 function prepare_stack(){
-  $("#chart").empty();
+  $("#chart").empty(); // clean the chart
 
   var colors = d3.scale.category20();
   var keyColor = function(d, i) {return colors(d.key)};
@@ -41,6 +41,9 @@ function prepare_stack(){
       return false;
   }
   function createIntervalTable() {
+    /*
+    method that creates a list of discrete intervals, starting from 0 ending to last time
+    */
       times_array = []; //array with all intervals
       console.log(max)
       for (var i=min; i<max; i+=time_interval){ //building this array
@@ -74,38 +77,35 @@ function prepare_stack(){
     }else{
       time_interval = +((data["interval_processed"]/360).toFixed(0))
     }
-    console.log(time_interval)
+    //console.log(time_interval)
     
     pages.forEach(function(entry){
-      folder_object = new Object();
-      folder_object["key"] = entry;
+      folder_object = new Object(); //dict for folder
+      folder_object["key"] = entry; //entry is the name of the folder
       folder_object["values"] = createIntervalTable();
-      data_folders.push(folder_object);
+      data_folders.push(folder_object); // all dict of folders
     });
     
-    folder_index = new Object();//index of folders in data_folders
+    folder_index = new Object();//index of folders in data_folders for fast access
     i=0;
     data_folders.forEach(function(entry){
       folder_index[entry["key"]] = i++;
     });
 
     //filling each time interval with the proper value
-    data["data"].forEach(function(entry){
+    data["data"].forEach(function(entry){ //entry is the history of a user
       var entry_sorted_keys = Object.keys(entry).sort( function(a,b) { //sorting object elements for fast access to the next element
           return +b - +a; //desc ordering
       });
       //console.log(entry_sorted_keys)
-      for (var key in entry) {
+      for (var key in entry) { //for each user visits
         if (entry.hasOwnProperty(key) && isInteger(key) && typeof entry[key] !== "undefined" && entry[key] != ""){
           var current_key_index =  entry_sorted_keys.indexOf(key);
-          next_item = current_key_index > 0 ?  entry_sorted_keys[current_key_index -1] : false
+          next_item = current_key_index > 0 ?  entry_sorted_keys[current_key_index -1] : false //get next item
           //next_item_ = findClosest(entry, key, true)
-          //console.log(next_item + " "+ next_item_)
           folder = entry[key]
-          //console.log(data_folders[folder_index[folder]]["values"])
           has_started = false;
-          //console.log("starting with key="+key)
-          data_folders[folder_index[folder]]["values"].every(function(interval){
+          data_folders[folder_index[folder]]["values"].every(function(interval){ // adds to the list of intervals the correct page visited
               if(+key >= +interval[0] && +key <= +interval[0]+time_interval){
                   interval[1]++;
                   //console.log("plus 1 for "+folder+" starting in "+ interval[0]+", ending in "+ next_item)
@@ -129,26 +129,26 @@ function prepare_stack(){
       }
     });
 
-    datam = JSON.parse(JSON.stringify(data_folders))
+    datam = JSON.parse(JSON.stringify(data_folders)) //bug?
 
     nv.addGraph(function() {
         chart = nv.models.stackedAreaChart()
-            .useInteractiveGuideline(true)
-            .x(function(d) {/*console.log(d[0]);*/ return new Date( (d[0]*1000) + data["start_time"] - 3600000) })//convert to local timestamp
+            .useInteractiveGuideline(true) //vertical line with current data
+            .x(function(d) { return new Date( (d[0]*1000) + data["start_time"] - 3600000) })//convert to local timestamp
             .y(function(d) { return d[1]; })
-            .controlLabels({stacked: "Stacked"})
-            .color(keyColor)
-            .duration(300);
+            .controlLabels({stacked: "Stacked"}) //default option
+            .color(keyColor) //gives the colors to the areas
+            .duration(300); //animation
         //chart.xScale = d3.time.scale();
-        chart.xAxis.axisLabel('Time').rotateLabels(25).tickFormat(function(d) {return d3.time.format('%e/%m %H:%M:%S')(new Date(d)) });
+        chart.xAxis.axisLabel('Time').rotateLabels(25).tickFormat(function(d) {return d3.time.format('%e/%m %H:%M:%S')(new Date(d)) }); //set time format and rotates the labels
         
         chart.yAxis.axisLabel('Visitors');
-        chart.yAxisTickFormat(d3.format(',.0d'));
+        chart.yAxisTickFormat(d3.format(',.0d')); //set dot notation
         d3.select('#chart')
             .datum(datam)
             .transition().duration(1000)
-            .call(chart)
-            .each('start', function() {
+            .call(chart) //creates the chart
+            .each('start', function() { //after initial animation, now animation is resetted
                 setTimeout(function() {
                     d3.selectAll('#chart1 *').each(function() {
                         if(this.__transition__)
@@ -156,8 +156,8 @@ function prepare_stack(){
                     })
                 }, 0)
             });
-        nv.utils.windowResize(chart.update);
-        end_spinner();
+        nv.utils.windowResize(chart.update); //resize the chart
+        end_spinner(); 
         return chart;
     });
   });
