@@ -1,6 +1,29 @@
-# Log to History
+﻿# Log to History
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
+- [Introduzione](#introduzione)
+  - [Tree](#tree)
+  - [Flow](#flow)
+    - [Nota su tree e flow](#nota-su-tree-e-flow)
+  - [Stack](#stack)
+- [Funzionamento](#funzionamento)
+  - [Lato Server](#lato-server)
+    - [Il ruolo di PHP](#il-ruolo-di-php)
+    - [main.py](#mainpy)
+  - [Lato Client](#lato-client)
+    - [tree_graph.js](#tree_graphjs)
+    - [flow_chart.js](#flow_chartjs)
+    - [stack_chart.js](#stack_chartjs)
+    - [Interfaccia grafica](#interfaccia-grafica)
+- [Ottimizzazioni](#ottimizzazioni)
+- [Problemi](#problemi)
+  - [Generare un access.log su server web alternativi](#generare-un-accesslog-su-server-web-alternativi)
+  - [Nascondere config.json al pubblico](#nascondere-configjson-al-pubblico)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Introduzione
 
@@ -14,12 +37,15 @@ Tree mostra un albero che si sviluppa lateralmente, esso fa combaciare ad ogni v
 ### Flow
 Flow è un diagramma di flusso che sviluppa verticalmente, il suo scopo è quello di mostrare i cambiamenti di pagina di un utente. In Flow ci sono tante colonne quante cartelle ci sono su un sito, all'interno di queste colonne sono rappresentati i visitatori come linee verticali, quando una linea cambia colonna significa che il visitatore ha cambiato pagina durante la sua navigazione. E' bene precisare che l'analisi in questo grafico non comprende tutte le pagine di un sito ma solo le cartelle dove sono residenti le pagine web. Questo significa che se un visitatore è sulla pagina _sito/cartella/index.html_, il grafico mostrerà l'utente come se stesse visitando _cartella/_. Si ha quindi una generalizzazione di cosa i visitatori stanno navigando. E' presente pure una casella di ricerca in cui si può cercare ed evidenziare un certo visitatore. 
 
+#### Nota su tree e flow
+Questi due grafici sono utili per avere una vista microscopica di un determinato periodo di tempo, che può andare dal minuto al massimo di un'ora. La logica di un intervallo così breve sta nel capire che se si analizzasse un periodo più lungo i grafici sarebbero troppo lunghi e non si capire più molto il rendering. Vi è da dire anche che ogni ad ogni riconnessione ad internet un utente cambia indirizzo IP, il che significa che è quasi impossibile rintracciare la storia di un utente in periodi lunghi, perchè esso ha cambiato IP.
+
 ### Stack
 Stack è un grafico che si concentra sulle visite non tenendo conto di chi ha fatto la visita. E' l'unico grafico che si discosta dagli altri. Esso mostra un grafico ad aree sovrapposte, ogni area di colore diverso rappresenta il quantitativo di visite su una determinata cartella nel tempo. Anche questo grafico usa le cartelle al posto delle singole pagine web, per non essere troppo particolareggiato ma più generale possibile. La sovrapposizione delle varie aree permette inoltre di visualizzare anche il numero complessivo di utenti su tutto il sito in un dato istante. Sono presenti dei controlli nella parte superiore del grafico, a destra viene permesso di passare fra il quantitativo di visite alla percentuale delle visite cliccando il pulsante "expanded", mentre se viene premuto "stream" i dati verranno organizzati attorno all'asse x e non solo al di sopra, creando un grafico organico e di flusso.
 
 ## Funzionamento
-I grafici proposti all'utente sono creati _online_, ovvero quando l'utente li chiede, così da circonscrivere solo il periodo che l'utente vuole analizzare.
-Il lavoro è spartito fra server(il sito) e client(l'utente), il server analizza il file di accesso al sito(access.log), seleziona il periodo richisto dall'utente e prepara per il client un file di piccole dimensioni, così da rendere il download veloce, che sarà ri-analizzato e renderizzato dal browser. 
+I grafici proposti all'utente sono creati _online_, ovvero quando l'utente li richiede, così da circonscrivere solo il periodo che l'utente vuole analizzare.
+Il lavoro è spartito fra server(il sito) e client(l'utente), il server analizza il file di accesso al sito(access.log), seleziona il periodo richisto dall'utente e prepara per il client un file di piccole dimensioni in formato JSON, così da rendere il download veloce, che sarà ri-analizzato e renderizzato dal browser. 
 Il lavoro del server è fatto da due programmi, Python e PHP. Python analizza il file di log e crea il file per il client, mentre PHP fa da ponte tra server e client.
 
 ### Lato Server
@@ -28,16 +54,16 @@ Il formato di log che questi server web usano è il formato _combined_ , che è 
 
 `145.50.30.131 - [10/Mar/2015:13:55:36 -0100] "GET /second.html HTTP/1.1" 200 2326 "http://www.site.com/first.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"`
 
-Come informazione esso fornisce l'indirizzo IP, la data della visita, il file richiesto e il metodo usato, il protocollo, la risposta del server, i byte scaricati, la pagina visitata in precedenza(referrer) e infine lo UserAgent del browser del visitatore.
+Come informazione esso fornisce l'indirizzo IP, la data della visita, il file richiesto e il metodo usato, il protocollo, la risposta del server, i byte scaricati, la pagina visitata in precedenza(referrer) e infine lo UserAgent del browser del visitatore. Da tutte queste informazioni, specialmente dal file richiesto e dal referrer si riesce a creare una catena di richeste e a ricreare una _user-story_. 
 
 #### Il ruolo di PHP
-Il primo programma ad essere interpellato è PHP tramite tramite una richiesta AJAX da parte del browser che porta la data di inizio e di fine scansione del log richesta dall'utente. PHP tramite il comando `ob_start()` e `system()` chiama uno script Python(main.py) con tre parametri, le due date e il tipo di grafico richesto dall'utente. Una volta eseguito lo script PHP invia al browser una stringa vuota se main.py ha avuto successo, una stringa "fail", se c'è stato un errore e non si possono visualizzare i dati. Durante la chiamata `system()` viene eseguito main.py, script fondamentale.
+Il primo programma ad essere interpellato sul server è PHP tramite tramite una richiesta AJAX da parte del browser che porta la data di inizio e di fine scansione del log richesta dall'utente. PHP tramite il comando `ob_start()` e `system()` chiama uno script Python(main.py) con tre parametri, le due date e il tipo di grafico richesto dall'utente. Una volta eseguito lo script, PHP invia al browser una stringa vuota se main.py ha avuto successo, una stringa "fail", se c'è stato un errore e non si possono visualizzare i dati. Durante la chiamata `system()` viene eseguito main.py, script fondamentale. Dopo l'avvio dello script si riceve l'output di main.py, o vuoto o "fail", con la chiamata `ob_get_clean()`. Lo stesso output verrà riportato al browser dell'utente che deciderà se scaricare il file JSON e renderizzarlo o lanciare un errore.
 
 #### main.py
-main.py è lo script che sta alla base di tutti e tre i grafici, è capace di costruirli tutti e tre. Come parametri prende due date e un numero che identifica il tipo di grafico che l'utente ha rihiesto: 0-> tree, 1-> flow, 2->stack.
+main.py è lo script che sta alla base di tutti e tre i grafici, è capace di costruire i dati per tutti e tre. Come parametri prende due date e un numero che identifica il tipo di grafico che l'utente ha rihiesto: 0-> tree, 1-> flow, 2->stack.
 Come prima cosa apre il file config.json, in cui ci sono dei parametri settati dal proprietario del sito:
 
-* access_log_location: il percorso dove risiede l'access.log(solitamente in /var/log/apache)
+* access_log_location: il percorso dove risiede l'access.log(solitamente in /var/log/_apache_)
 * website_name: il nome del sito(www.sito.com)
 * folder_level: la profodità dalle cartelle da analizzare, ad esempio se impostato ad 1 la seguente richiesta www.sito/cartella/cartella2/file.html verrà cosiderata solo fino a /cartella, se impostato a due, viene considerata fino a /cartella/cartella2
 * blacklist_folders: questa è una blacklist delle cartelle che non si vuole mostrare al pubblico, come portali di amministrazione o di statistiche
@@ -111,15 +137,15 @@ Dal punto di vista del client è sufficente un qualisasi browser per visualizzar
 
 #### tree_graph.js
 
-Questo script crea un albero orizzontale, il primo livello di nodi idetnifica l'indirizzo IP dei visitatori, gli altri livelli sono le pagine visitate.In questo grafico non c'è una fase di pre-processing a differenza di flow e stack, quindi lo script procede subito a renderizzare i dati creando un oggetto SVG dove si svilupperà il grafico, e in seguito analizzando il file JSON. Sostanzialmente il file JSON è costruito gerarchialmente, ovvero un IP ha dei figli e questi figli a loro volta hanno altri figli; quello che tree_graph.js è tradurre questa gerarchia in un albero. Ogni nodo viene creato con la funzione `nodeEnter()` e unito agli altri nodi con `link()`. Ad ogni nodo sono associato due eventi, "click" che mostra e nasconde i figli del nodo e "hover" che mostra un riquadro con le informazioni del nodo. 
+Questo script crea un albero orizzontale, il primo livello di nodi idetnifica l'indirizzo IP dei visitatori, gli altri livelli sono le pagine visitate. In questo grafico non c'è una fase di pre-processing a differenza di flow e stack, quindi lo script procede subito a renderizzare i dati creando un oggetto SVG dove si svilupperà il grafico, e in seguito analizzando il file JSON. Sostanzialmente il file JSON è costruito gerarchialmente, ovvero un IP ha dei figli e questi figli a loro volta hanno altri figli; quello che fa tree_graph.js è tradurre questa gerarchia in un albero. Ogni nodo viene creato con la funzione `nodeEnter()` e unito agli altri nodi con `link()`. Ad ogni nodo sono associato due eventi, "click" che mostra e nasconde i figli del nodo e "hover" che mostra un riquadro con le informazioni del nodo. 
 
 #### flow_chart.js
 
-Anche flow_chart.js scarica subito il JSON contentete i dati riguardo alle visite. Avviene una fase di analisi e poi di rendering. Il rendering viene affidato a una funzione, `draw()`, che è da considerarsi una sorta black box, in quanto non è stata scritta da me ma presa da un sito: [Football Conferences](http://www.nytimes.com/newsgraphics/2013/11/30/football-conferences/). Questo script quindi prepara i dati per la funzione e poi la chiama. Quello che viene essenzialmente fatto dalla fase di pre-processing è aggiungere delle entry al file JSON, perchè il codice preso è basato per analizzare anni, mentre Log to History deve analizzare misure molto più brevi, come minuti e secondi. Ciò che è invece fatto da `draw()` è disegnare delle linee verticali, ogni linea rappresenta un visitatore che sta navigando su un pagina del sito, e delle linee di shift che stanno a significare che il visitatore ha cambiato pagina. 
+Anche `flow_chart.js` scarica subito il JSON contentete i dati riguardo alle visite. Avviene una fase di analisi e poi di rendering. Il rendering viene affidato a una funzione, `draw()`, che è da considerarsi una sorta black box, in quanto non è stata scritta da me ma presa da un sito: [Football Conferences](http://www.nytimes.com/newsgraphics/2013/11/30/football-conferences/). Questo script quindi prepara i dati per la funzione e poi la chiama. Quello che viene essenzialmente fatto dalla fase di pre-processing è aggiungere delle entry al file JSON, perchè il codice preso è basato per analizzare anni, mentre Log to History deve analizzare misure molto più brevi, come minuti e secondi. Ciò che è invece fatto da `draw()` è disegnare delle linee verticali, rappresentanti i visitatori che sta navigando su un pagina del sito, e delle linee di shift che stanno a significare che il visitatore ha cambiato pagina.
 
 #### stack_chart.js
 
-Come flow, stack_chart.js scarica il file JSON, da questo file egli ne costruisce un array che verrà renderizzato in seguito. Questo array è costituito da ogni cartella del sito associata ad una lista di intervalli discreti, analizzando le visite nel file JSON viene incrementato un contatore in corrispondenza dell'intervallo corretto e della pagina visitata. Questo array viene poi messo a grafico usando una libreria chiamata [NVD3](https://github.com/novus/nvd3), basata su D3. Il grafico è ad aree sovrapposte, il che significa che nello stesso istante si può osservare sia quanti visitatori erano presenti nelle singole pagine, sia quanti visitatori aveva il sito in generale.
+Come flow, `stack_chart.js` scarica il file JSON, da questo file egli ne costruisce un array che verrà renderizzato in seguito. Questo array è costituito da ogni cartella del sito associata ad una lista di intervalli discreti, analizzando le visite nel file JSON viene incrementato un contatore in corrispondenza dell'intervallo corretto e della pagina visitata. Questo array viene poi messo a grafico usando una libreria chiamata [NVD3](https://github.com/novus/nvd3), basata su D3. Il grafico è ad aree sovrapposte, il che significa che nello stesso istante si può osservare sia quanti visitatori erano presenti nelle singole pagine, sia quanti visitatori aveva il sito in generale. Questo grafico è l'unico che può analizzare tempi lunghi come giorni, grazie al fatto di essere dinamico, infatti la grandezza degli intervalli discreti è scelta da`stack_chart.js` in base alla durata del periodo di analisi.
 
 #### Interfaccia grafica
 
@@ -127,10 +153,70 @@ L'interfaccia grafica di Log to History è composta quesi solamente da un header
 
 ## Ottimizzazioni
 
+Dopo la fase di creazione di Log to History è avvenuta anche una fase di testing e di ottimizazione delle performance. Riguardo a main.py è stato usato questo strumento: [LineProfiler](https://github.com/rkern/line_profiler) che permette di vedere quanto tempo viene speso per ogni riga di una funzione che si vuole analizzare. In particolare usando questo tool si è visto che main.py trascorreva molto tempo a convertire delle stringhe in date con il metodo `time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S')` è stato quindi sostituito da uno molto più efficente:
+
+```python
+month_map = {'Jan': 1, 'Feb': 2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7, 
+    'Aug':8,  'Sep': 9, 'Oct':10, 'Nov': 11, 'Dec': 12}
+
+def apachetime(s):
+    '''
+    method that parses 4 times faster dates using slicing instead of regexs
+    '''
+    return datetime.datetime(int(s[7:11]), month_map[s[3:6]], int(s[0:2]), \
+         int(s[12:14]), int(s[15:17]), int(s[18:20]))
+```
+         
+Per analizzare gli script lato browser invece è stata usata la console di Google Chrome nella sezione di profiling, essa mostra il tempo speso per ogni funzione. Nel nostro caso vi era un ammontare di tempo speso nella funzione `findClosest()` che in un dizionario, oggetto non ordinato in JavaScript, restituisce l'elemento dopo uno selezionato.
+
+```javascript
+function findClosest(array, id, increasing) {
+        /* method that, in a dictionary(associative array), finds the element after the passed one */
+        var step = increasing ? 1 : -1; //search next or previous
+        var i=+id+step;
+        if( array[id]!="" && array[id]!==undefined ){
+            for(; i>=0 && i<=o; i+=step ){
+                if( array[i] && array[i]!="" ){
+                    return i;
+                }
+            }
+        } return false;
+    }
+```
+
+Questo metodo è altamente inefficente perchè per cercare l'elemento dopo procede a passi piccoli(+1, -1) controllando se appunto esiste un elemento, il metodo è stato sostituito da un array in cui ad ogni elemento dell'array è associato un nuovo indice: 
+
+```javascript
+var array_sorted_keys = Object.keys(array).sort( function(a,b) { //sorting object elements for fast access to the next element
+    return +b - +a; //desc ordering
+});
+```
+
+Dunque per accedere all'elemento successivo basta chiedere l'indice dell'elemento corrente con `current_key_index = entry_sorted_keys.indexOf(key)` e eseguire `array_sorted_keys[current_key_index +1]`
+
+
 ## Problemi
 
 ### Generare un access.log su server web alternativi
 
 Se come server web si usa Node.js, che non genera alcun file di log, di seguito si possono trovare delle implementazioni per creare un access.log.
+
 * [Node.js log](https://github.com/petershaw/NodeJS-Apache-Like-AccessLog)
 * [Node.js log](https://www.npmjs.com/package/apache-log)
+
+### Nascondere config.json al pubblico
+
+Se si vuole nascondere questo file per non mostrare la blacklist delle cartelle basta aggiungere una regola alla configurazione di apache o nginx.
+
+```
+<FilesMatch "/config.json$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+```
+
+```
+location ~ \config.json {
+    deny all;
+}
+```
