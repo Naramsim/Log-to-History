@@ -242,7 +242,7 @@ def get_folder(url):
     '''
     token = url.split("/")
     folder = ""
-    print token
+    #print token
     if "." in token[-1]:
         token[-1] = ''
     if (len(token) <= depth) and (depth>0):
@@ -277,13 +277,36 @@ def get_requests():
             '"(.+)"\s' #referrer: 5
             '"(.+)"' #user agent: 6
         )
+    log_pat =(r''
+            '\[(.+)\]\s'
+        )
+    log_size = os.path.getsize(log_dir) #log size in bytes
+    #print log_size
+    with open(log_dir, 'rb') as fh: #binary read
+        first_line_of_log = next(fh).decode() #first line of log
+        first_time_of_log = int(apachetime( first_line_of_log.split("[")[1] ).strftime("%s")) #first time in timestamp
+        fh.seek(-2048, os.SEEK_END) #current pointer location is moved 2048 bytes before the end of the file
+        last_line_of_log = fh.readlines()[-1].decode() #last line of log
+        last_time_of_log = int(apachetime( last_line_of_log.split("[")[1] ).strftime("%s")) #last time in timestamp
+        start_percentage = (int(start_point.strftime("%s")) - first_time_of_log) / float(last_time_of_log - first_time_of_log)
+        #print start_percentage
+        first_seek_jump = int((start_percentage - 0.05) * log_size)
+        #print first_seek_jump
+
     with open(log_dir, "r") as access_log_file:
+        if 0 < start_percentage < 1:
+            access_log_file.seek(first_seek_jump, os.SEEK_SET) #jump over unuseful lines
+            access_log_file.readline() #read a chunked line 
+            cursor_time = apachetime( find(log_pat, access_log_file.readline(), None)[0] )
+            #if cursor_time > start_point: #jumped too much
+                #bring back
         requests = []
         for line in access_log_file:
             compiled_line = find(pat, line, None)
             if compiled_line:
                 compiled_line = compiled_line[0] # convert our [("","","")] to ("","","")
                 request_time = apachetime(compiled_line[1])
+                #print request_time
                 #request_time_ = time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call loses the time zone, but it is quicker than using dateutil
                 #print request_time
                 #print request_time_
@@ -291,6 +314,8 @@ def get_requests():
                 if ( start_point <= request_time <= end_point ) and ( not any(black in compiled_line[2] for black in black_folders ) ):
                     if ( any(x in compiled_line[2] for x in filters) or (compiled_line[2].endswith('/')) or (('.') not in compiled_line[2]) ):
                         requests.append(compiled_line)
+                elif request_time > end_point:
+                    return requests
     return requests #list of all access log lines
 
 def find(pat, text, match_item):
