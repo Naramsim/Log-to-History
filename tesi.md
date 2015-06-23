@@ -13,10 +13,15 @@ I tre grafici di Log to History hanno i seguenti nomi: tree, flow e stack.
 ### Tree
 Tree mostra un albero che si sviluppa lateralmente, esso fa combaciare ad ogni visitatore un set di pagine che sono state visualizzate _direttamente_ dall'utente, direttamente significa che l'utente proviene da un altro sito, come Google, Bing e altri, o che ha caricato il sito dalla barra degli indirizzi del Browser. Ogni visita diretta è dunque rappresentata da un nodo, che ha come figli le pagine visitate dall'utente che ha cliccato su un link del sito che si sta analizzando. Questo grafico rappresenta la cronologia di un utente calcolata secondo i movimenti via link. Passando sopra ad ogni nodo che identifica un visitatore si può vedere l'user agent, se è identificato come un bot o un crawler il nodo verrà colorato di giallo. Mentre se si passa sopra una pagina visitata da un utente comparirà la data della visita.
 
+![Tree Graph](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_tree.png "Tree Graph")
+
+Questo grafico é la rappresentazione di Tree, si vedono quindi molti IP, e se un IP viene cliccato si aprono le pagine che ha richiesto direttamente. In questo caso 7.50.142.24(il penultimo IP analizzato) ha comiciato a visitare il sito dalla pagina _/_, che é l'home-page del sito, si é quindi spostato a _/atleta_ cliccando qualche link nella home-page, poi si é spostato su _atleta/Levi-Roche-Mandji/150970_. Nel caso di 94.32.224.201(l'ultimo IP), nell'ultima parte della sua visita partendo da _/societa/1810_ egli ha richesto 5 pagine cliccando su 5 link diversi probabilmente aprendo le nuove pagine come nuove tab del'browser.
+
 ### Flow
 Flow è un diagramma di flusso che sviluppa verticalmente, il suo scopo è quello di mostrare i cambiamenti di pagina di un utente. In Flow ci sono tante colonne quante cartelle ci sono su un sito, all'interno di queste colonne sono rappresentati i visitatori come linee verticali, quando una linea cambia colonna significa che il visitatore ha cambiato pagina durante la sua navigazione. E' bene precisare che l'analisi in questo grafico non comprende tutte le pagine di un sito ma solo le cartelle dove sono residenti le pagine web. Questo significa che se un visitatore è sulla pagina _sito/cartella/index.html_, il grafico mostrerà l'utente come se stesse visitando _cartella/_. Si ha quindi una generalizzazione di cosa i visitatori stanno navigando. E' presente pure una casella di ricerca in cui si può cercare ed evidenziare un certo visitatore. 
 
 ![Flow Graph](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_flow.png "Flow Graph")
+
 In questo esempio si possono notare i visitatori di un sito del giorno 8 Giugno dalle 19.07 alle 19.10, é evidenziato un visitatore che é stato cercato tramite la search-box in alto a sinistra. Il visitatore é identificato dal suo indirizzo IP e la sua cronologia di un colore arancio. Si puó capire che il visitatore ha abbandonato una pagina un _/confronto_ verso le 19.50 per andare su una pagina in _/atleta_, poi é ritornato su _/confronto_ e in fine é ritornato in _/atleta_.
 
 #### Nota su tree e flow
