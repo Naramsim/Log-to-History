@@ -1,32 +1,7 @@
 # Log to History
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-
-- [Introduzione](#introduzione)
-  - [Tree](#tree)
-  - [Flow](#flow)
-    - [Nota su tree e flow](#nota-su-tree-e-flow)
-  - [Stack](#stack)
-- [Sviluppo](#sviluppo)
-  - [fase iniziale](#fase-iniziale)
-  - [fase di sviluppo](#fase-di-sviluppo)
-- [Funzionamento](#funzionamento)
-  - [Lato Server](#lato-server)
-    - [Il ruolo di PHP](#il-ruolo-di-php)
-    - [main.py](#mainpy)
-  - [Lato Client](#lato-client)
-    - [tree_graph.js](#tree_graphjs)
-    - [flow_chart.js](#flow_chartjs)
-    - [stack_chart.js](#stack_chartjs)
-    - [Interfaccia grafica](#interfaccia-grafica)
-- [Ottimizzazioni](#ottimizzazioni)
-- [Problemi](#problemi)
-  - [Generare un access.log su server web alternativi](#generare-un-accesslog-su-server-web-alternativi)
-  - [Nascondere config.json al pubblico](#nascondere-configjson-al-pubblico)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!-- START doctoc -->
+<!-- END doctoc -->
 
 ## Introduzione
 
@@ -40,11 +15,20 @@ Tree mostra un albero che si sviluppa lateralmente, esso fa combaciare ad ogni v
 ### Flow
 Flow è un diagramma di flusso che sviluppa verticalmente, il suo scopo è quello di mostrare i cambiamenti di pagina di un utente. In Flow ci sono tante colonne quante cartelle ci sono su un sito, all'interno di queste colonne sono rappresentati i visitatori come linee verticali, quando una linea cambia colonna significa che il visitatore ha cambiato pagina durante la sua navigazione. E' bene precisare che l'analisi in questo grafico non comprende tutte le pagine di un sito ma solo le cartelle dove sono residenti le pagine web. Questo significa che se un visitatore è sulla pagina _sito/cartella/index.html_, il grafico mostrerà l'utente come se stesse visitando _cartella/_. Si ha quindi una generalizzazione di cosa i visitatori stanno navigando. E' presente pure una casella di ricerca in cui si può cercare ed evidenziare un certo visitatore. 
 
+![Flow Graph](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_flow.png "Flow Graph")
+In questo esempio si possono notare i visitatori di un sito del giorno 8 Giugno dalle 19.07 alle 19.10, é evidenziato un visitatore che é stato cercato tramite la search-box in alto a sinistra. Il visitatore é identificato dal suo indirizzo IP e la sua cronologia di un colore arancio. Si puó capire che il visitatore ha abbandonato una pagina un _/confronto_ verso le 19.50 per andare su una pagina in _/atleta_, poi é ritornato su _/confronto_ e in fine é ritornato in _/atleta_.
+
 #### Nota su tree e flow
 Questi due grafici sono utili per avere una vista microscopica di un determinato periodo di tempo, che può andare dal minuto al massimo di un'ora. La logica di un intervallo così breve sta nel capire che se si analizzasse un periodo più lungo i grafici sarebbero troppo lunghi e non si capire più molto il rendering. Vi è da dire anche che ad ogni riconnessione ad internet un utente cambia indirizzo IP, il che significa che è quasi impossibile rintracciare la storia di un utente in periodi lunghi, perchè esso ha cambiato IP. In stack invece l'utente non è più considerato e dunque l'analisi si può prolungare a qualsiasi periodo.
 
 ### Stack
 Stack è un grafico che si concentra sulle visite non tenendo conto di chi ha fatto la visita. E' l'unico grafico che si discosta dagli altri. Esso mostra un grafico ad aree sovrapposte, ogni area di colore diverso rappresenta il quantitativo di visite su una determinata cartella nel tempo. Anche questo grafico usa le cartelle al posto delle singole pagine web, per non essere troppo particolareggiato e più generale possibile. La sovrapposizione delle varie aree permette inoltre di visualizzare anche il numero complessivo di utenti su tutto il sito in un dato istante. Sono presenti dei controlli nella parte superiore del grafico, a destra viene permesso di passare fra il quantitativo di visite alla percentuale delle visite cliccando il pulsante "expanded", mentre se viene premuto "stream" i dati verranno organizzati attorno all'asse x e non solo al di sopra, creando un grafico organico e di flusso.
+
+![Stack Chart](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_stack.png "Stack Chart")
+Sopra viene mostrato un esempio prolungato di uno stack chart, dalle tre di mattina fino alle venti di sera, si puó notare come in generale gli utenti tendano a crescere durante la mattinata per poi stabilizzarsi. Vi sono anche alcuni picchi che probabilmente sono dovuti ad attivitá di indicizzazione di spider e crawler. Si puó notare anche che le pagine piú richieste sono quelle che risiedono nella cartella _/atleta_.
+
+![Stack Chart](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_stack3.png "Stack Chart")
+In questo esempio viene analizzato invece solo un breve periodo di un'ora, e viene usato il metodo _Expanded_ che mostra la percentuale di utenti per ogni cartella del sito. Si puó vedere che nella prima mezz'ora gli utenti sono prevalentemente su _/atleta_, mentre nella seconda mezz'ora tendono a crescere le visite su _/manifestazioni_ e sulla root del sito(_/_), ovvero la home-page.
 
 ## Sviluppo
 
