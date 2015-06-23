@@ -1,4 +1,5 @@
 # Log to History
+Uno strumento di analisi rivolto al web.
 
 <!-- START doctoc -->
 <!-- END doctoc -->
@@ -25,15 +26,17 @@ Questi due grafici sono utili per avere una vista microscopica di un determinato
 Stack è un grafico che si concentra sulle visite non tenendo conto di chi ha fatto la visita. E' l'unico grafico che si discosta dagli altri. Esso mostra un grafico ad aree sovrapposte, ogni area di colore diverso rappresenta il quantitativo di visite su una determinata cartella nel tempo. Anche questo grafico usa le cartelle al posto delle singole pagine web, per non essere troppo particolareggiato e più generale possibile. La sovrapposizione delle varie aree permette inoltre di visualizzare anche il numero complessivo di utenti su tutto il sito in un dato istante. Sono presenti dei controlli nella parte superiore del grafico, a destra viene permesso di passare fra il quantitativo di visite alla percentuale delle visite cliccando il pulsante "expanded", mentre se viene premuto "stream" i dati verranno organizzati attorno all'asse x e non solo al di sopra, creando un grafico organico e di flusso.
 
 ![Stack Chart](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_stack.png "Stack Chart")
+
 Sopra viene mostrato un esempio prolungato di uno stack chart, dalle tre di mattina fino alle venti di sera, si puó notare come in generale gli utenti tendano a crescere durante la mattinata per poi stabilizzarsi. Vi sono anche alcuni picchi che probabilmente sono dovuti ad attivitá di indicizzazione di spider e crawler. Si puó notare anche che le pagine piú richieste sono quelle che risiedono nella cartella _/atleta_.
 
 ![Stack Chart](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_stack3.png "Stack Chart")
+
 In questo esempio viene analizzato invece solo un breve periodo di un'ora, e viene usato il metodo _Expanded_ che mostra la percentuale di utenti per ogni cartella del sito. Si puó vedere che nella prima mezz'ora gli utenti sono prevalentemente su _/atleta_, mentre nella seconda mezz'ora tendono a crescere le visite su _/manifestazioni_ e sulla root del sito(_/_), ovvero la home-page.
 
 ## Sviluppo
 
 ### fase iniziale
-Come fase iniziale prima ancora di capire il nostro obiettivo abbiamo studiato e installato molto analizzatori di access.log che si trovano in rete, li abbiamo confrontati e siamo giunti alla concolusione che l'unica cosa che mancava era uno strumento di analisi microscopica che tenesse conto dell'utente, che mostrasse come si muove all'interno di un sito. Da qui è nata l'idea per lo sviluppo di Log to History. Dopo aver scoperto il nostro obiettivo abbiamo cominciato a studiare il metodo migliore per realizzarlo, quali linguaggi usare, come renderizzare i dati, come interfacciarsi con l'utente. Siamo quindi arrivati ad utilizzare Python lato Server, per la sua semplicità e velocità. PHP come intermediario con il browser dell'utente, si sarebbe potuto riutilizzare Python come web-server attreverso dei framework(esempo: Django, Flask, Tornado) ma secondo [alcune statistiche](http://news.netcraft.com/archives/2015/05/19/may-2015-web-server-survey.html) la maggior parte degli utenti usa ancora la soluzione Apache/PHP come server web. [D3](https://github.com/mbostock/d3) per il rendering dei dati su grafico. 
+Come fase iniziale prima ancora di capire il nostro obiettivo abbiamo studiato e installato molti [analizzatori]() di access.log open-source che si trovano in rete, li abbiamo confrontati e siamo giunti alla concolusione che l'unica cosa che mancava era uno strumento di analisi microscopica che tenesse conto dell'utente, che mostrasse come si muove all'interno di un sito. Da qui è nata l'idea per lo sviluppo di Log to History. Dopo aver scoperto il nostro obiettivo abbiamo cominciato a studiare il metodo migliore per realizzarlo, quali linguaggi usare, come renderizzare i dati, come interfacciarsi con l'utente. Siamo quindi arrivati ad utilizzare Python lato Server, per la sua semplicità e velocità. PHP come intermediario con il browser dell'utente, si sarebbe potuto riutilizzare Python come web-server attreverso dei framework(esempo: Django, Flask, Tornado) ma secondo [alcune statistiche](http://news.netcraft.com/archives/2015/05/19/may-2015-web-server-survey.html) la maggior parte degli utenti usa ancora la soluzione Apache/PHP come server web. [D3](https://github.com/mbostock/d3) per il rendering dei dati su grafico. 
 
 ### fase di sviluppo
 Durante la fase di sviluppo abbiamo usato come editor di codice [Sublime 3](https://www.sublimetext.com/3), come strumento di controllo versione Git assieme a Github, sul quale si trova tutto il [codice sorgente](https://github.com/Naramsim/Log-to-History/). Per testare il prodotto si è usato un [server](https://mtgfiddle.me/tirocinio/pezze/) su DigitalOcean e come access.log il file di log di un sito molto visitato: [Atletica.me](http://atletica.me/).
@@ -215,3 +218,17 @@ location ~ \config.json {
     deny all;
 }
 ```
+
+## Altri analizzatori open-source
+
+Prima di sviluppare Log to History é stata eseguita una analisi degli strumenti giá esistenti per l'analisi delle visite di siti web, di seguito si trovano alcuni progetti open-source con una brevissima analisi delle loro funzionalitá:
+
+* [Piwik](https://github.com/piwik/piwik): Software avanzato che usa l’injection di codice js nelle pagine di un sito per il tracking degli utenti, alternativa a Google Analytics.
+* [Request-log-analyzer](https://github.com/wvanbergen/request-log-analyzer): Software scritto in Ruby che analizza tanti formati di file di log non solo access log. Fornisce molte statistiche nel terminale. Non dispone di interfaccia web.
+* [Goaccess](https://github.com/allinurl/goaccess/): Software molto avanzato scritto in C che analizza file di log via terminale anche in real-time, può generare file html statici.
+* [Apache-scalp](https://github.com/neuroo/apache-scalp): script python che mostra in terminale i possibili attacchi che ha subito un server web leggendo le richeste dell'access log, mostra solo gli attacchi, non altre statistiche. Genera html statico. 
+* [Http_log_analyzer](https://github.com/tmarly/http_log_analyzer): analizza l’access log e ne fa il display via web, manca di un analisi microscopica
+* [Http-logs-analyzer](https://github.com/flrnull/http-logs-analyzer): Script in c++ che analizza velocemente un file di log nel terminale e mostra a video un JSON con le statistiche. Non dispone di interfaccia web.
+* [Nginx-mongo-logger](https://github.com/mikedamage/nginx-mongo-logger): Script che lavora in background e inserisce ogni nuova linea dell’access log in un database Mongo. Fondamentalmente non fornisce statistiche ma solo un database per costrirle.
+* [ServerLogStats](https://github.com/danielstjules/ServerLogStats): analizza i log che gli utenti caricano, quindi non quello del server e mostra varie statistiche: è scritto in Javascript.
+* [Live-log-analyzer](https://github.com/saltycrane/live-log-analyzer): Software python che mostra via web in real-time statistiche sull’access log. 
