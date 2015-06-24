@@ -1,8 +1,35 @@
 # Log to History
 Uno strumento di analisi rivolto al web.
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+Indice:
+- [Introduzione](#introduzione)
+  - [Tree](#tree)
+  - [Flow](#flow)
+    - [Nota su tree e flow](#nota-su-tree-e-flow)
+  - [Stack](#stack)
+- [Sviluppo](#sviluppo)
+  - [Fase iniziale](#fase-iniziale)
+  - [Fase di sviluppo](#fase-di-sviluppo)
+  - [Fase di testing](#fase-di-testing)
+- [Funzionamento](#funzionamento)
+  - [Lato Server](#lato-server)
+    - [Il ruolo di PHP](#il-ruolo-di-php)
+    - [main.py](#mainpy)
+  - [Lato Client](#lato-client)
+    - [tree_graph.js](#tree_graphjs)
+    - [flow_chart.js](#flow_chartjs)
+    - [stack_chart.js](#stack_chartjs)
+    - [Interfaccia grafica](#interfaccia-grafica)
+- [Ottimizzazioni](#ottimizzazioni)
+- [Problemi](#problemi)
+  - [Generare un access.log su server web alternativi](#generare-un-accesslog-su-server-web-alternativi)
+  - [Nascondere config.json al pubblico](#nascondere-configjson-al-pubblico)
+- [Altri analizzatori open-source](#altri-analizzatori-open-source)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Introduzione
 
