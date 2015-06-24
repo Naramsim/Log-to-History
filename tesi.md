@@ -11,11 +11,11 @@ Esso è composto da tre grafici che vengono costruiti andando ad analizzare un f
 I tre grafici di Log to History hanno i seguenti nomi: tree, flow e stack. 
 
 ### Tree
-Tree mostra un albero che si sviluppa lateralmente, esso fa combaciare ad ogni visitatore un set di pagine che sono state visualizzate _direttamente_ dall'utente, direttamente significa che l'utente proviene da un altro sito, come Google, Bing e altri, o che ha caricato il sito dalla barra degli indirizzi del Browser. Ogni visita diretta è dunque rappresentata da un nodo, che ha come figli le pagine visitate dall'utente che ha cliccato su un link del sito che si sta analizzando. Questo grafico rappresenta la cronologia di un utente calcolata secondo i movimenti via link. Passando sopra ad ogni nodo che identifica un visitatore si può vedere l'user agent, se è identificato come un bot o un crawler il nodo verrà colorato di giallo. Mentre se si passa sopra una pagina visitata da un utente comparirà la data della visita.
+Tree mostra un albero che si sviluppa lateralmente, esso fa combaciare ad ogni visitatore un set di pagine che sono state visualizzate _direttamente_ dall'utente, direttamente significa che l'utente proviene da un altro sito, come Google, Bing e altri, o che ha caricato il sito dalla barra degli indirizzi del browser. Ogni visita diretta è dunque rappresentata da un nodo, che ha come figli le pagine visitate dall'utente che ha cliccato su un link del sito che si sta analizzando. Questo grafico rappresenta la cronologia di un utente calcolata secondo i movimenti via link. Passando sopra ad ogni nodo che identifica un visitatore si può vedere l'user agent, se è identificato come un bot o un crawler il nodo verrà colorato di giallo. Mentre se si passa sopra una pagina visitata da un utente comparirà la data della visita.
 
 ![Tree Graph](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_tree.png "Tree Graph")
 
-Questo grafico é la rappresentazione di Tree, si vedono quindi molti IP, e se un IP viene cliccato si aprono le pagine che ha richiesto direttamente. In questo caso 7.50.142.24(il penultimo IP analizzato) ha comiciato a visitare il sito dalla pagina _/_, che é l'home-page del sito, si é quindi spostato a _/atleta_ cliccando qualche link nella home-page, poi si é spostato su _atleta/Levi-Roche-Mandji/150970_. Nel caso di 94.32.224.201(l'ultimo IP), nell'ultima parte della sua visita partendo da _/societa/1810_ egli ha richesto 5 pagine cliccando su 5 link diversi probabilmente aprendo le nuove pagine come nuove tab del'browser.
+Questo grafico é la rappresentazione di Tree, si vedono quindi molti IP, e se un IP viene cliccato si aprono le pagine che ha richiesto direttamente. In questo caso 7.50.142.24(il penultimo IP analizzato) ha comiciato a visitare il sito dalla pagina _/_, che é l'home-page del sito, si é quindi spostato a _/atleta_ cliccando qualche link nella home-page, poi si é spostato su _atleta/Levi-Roche-Mandji/150970_. Nel caso di 94.32.224.201(l'ultimo IP), nell'ultima parte della sua visita partendo da _/societa/1810_ egli ha richesto 5 pagine cliccando su 5 link diversi probabilmente aprendo le nuove pagine come nuove tab del browser.
 
 ### Flow
 Flow è un diagramma di flusso che sviluppa verticalmente, il suo scopo è quello di mostrare i cambiamenti di pagina di un utente. In Flow ci sono tante colonne quante cartelle ci sono su un sito, all'interno di queste colonne sono rappresentati i visitatori come linee verticali, quando una linea cambia colonna significa che il visitatore ha cambiato pagina durante la sua navigazione. E' bene precisare che l'analisi in questo grafico non comprende tutte le pagine di un sito ma solo le cartelle dove sono residenti le pagine web. Questo significa che se un visitatore è sulla pagina _sito/cartella/index.html_, il grafico mostrerà l'utente come se stesse visitando _cartella/_. Si ha quindi una generalizzazione di cosa i visitatori stanno navigando. E' presente pure una casella di ricerca in cui si può cercare ed evidenziare un certo visitatore. 
@@ -36,15 +36,18 @@ Sopra viene mostrato un esempio prolungato di uno stack chart, dalle tre di matt
 
 ![Stack Chart](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_stack3.png "Stack Chart")
 
-In questo esempio viene analizzato invece solo un breve periodo di un'ora, e viene usato il metodo _Expanded_ che mostra la percentuale di utenti per ogni cartella del sito. Si puó vedere che nella prima mezz'ora gli utenti sono prevalentemente su _/atleta_, mentre nella seconda mezz'ora tendono a crescere le visite su _/manifestazioni_ e sulla root del sito(_/_), ovvero la home-page.
+In questo esempio viene analizzato invece solo un breve periodo di un'ora, e viene usato il metodo _Expanded_ che mostra la percentuale di utenti per ogni cartella del sito. Si puó vedere che nella prima mezz'ora gli utenti sono prevalentemente su _/atleta_, mentre nella seconda mezz'ora tendono a crescere le visite su _/confronto_ e sulla root del sito(_/_), ovvero la home-page.
 
 ## Sviluppo
 
 ### Fase iniziale
-Come fase iniziale prima ancora di capire il nostro obiettivo abbiamo studiato e installato molti [analizzatori](#altri-analizzatori-open-source) di access.log open-source che si trovano in rete, li abbiamo confrontati e siamo giunti alla concolusione che l'unica cosa che mancava era uno strumento di analisi microscopica che tenesse conto dell'utente, che mostrasse come si muove all'interno di un sito. Da qui è nata l'idea per lo sviluppo di Log to History. Dopo aver scoperto il nostro obiettivo abbiamo cominciato a studiare il metodo migliore per realizzarlo, quali linguaggi usare, come renderizzare i dati, come interfacciarsi con l'utente. Siamo quindi arrivati ad utilizzare Python lato Server, per la sua semplicità e velocità. PHP come intermediario con il browser dell'utente, si sarebbe potuto riutilizzare Python come web-server attreverso dei framework(esempo: Django, Flask, Tornado) ma secondo [alcune statistiche](http://news.netcraft.com/archives/2015/05/19/may-2015-web-server-survey.html) la maggior parte degli utenti usa ancora la soluzione Apache/PHP come server web. [D3](https://github.com/mbostock/d3) per il rendering dei dati su grafico. 
+Come fase iniziale prima ancora di capire il nostro obiettivo abbiamo studiato e installato molti [analizzatori](#altri-analizzatori-open-source) di access.log open-source che si trovano in rete, li abbiamo confrontati e siamo giunti alla concolusione che l'unica cosa che mancava era uno strumento di analisi microscopica che tenesse conto dell'utente, che mostrasse come si muove all'interno di un sito. Da qui è nata l'idea per lo sviluppo di Log to History. Dopo aver scoperto il nostro obiettivo abbiamo cominciato a studiare il metodo migliore per realizzarlo, quali linguaggi usare, come renderizzare i dati, come interfacciarsi con l'utente. Siamo quindi arrivati ad utilizzare Python lato Server, per la sua semplicità e velocità. PHP come intermediario con il browser dell'utente, si sarebbe potuto riutilizzare Python come web-server attreverso dei framework(esempo: Django, Flask, Tornado) ma secondo [alcune statistiche](http://news.netcraft.com/archives/2015/05/19/may-2015-web-server-survey.html) la maggior parte degli utenti usa ancora la soluzione Apache/PHP come server web. [D3](https://github.com/mbostock/d3) per il rendering dei dati su browser. 
 
 ### Fase di sviluppo
 Durante la fase di sviluppo abbiamo usato come editor di codice [Sublime 3](https://www.sublimetext.com/3), come strumento di controllo versione Git assieme a Github, sul quale si trova tutto il [codice sorgente](https://github.com/Naramsim/Log-to-History/). Per testare il prodotto si è usato un [server](https://mtgfiddle.me/tirocinio/pezze/) su DigitalOcean e come access.log il file di log di un sito molto visitato: [Atletica.me](http://atletica.me/).
+
+### Fase di testing
+Ogni settimana dopo ogni aggiunta al codice é avvenuta una fase di testing, fase che si é prolungata quando il programma é stato ultimato, dalla fase di testing si é poi passati ad [ottimizzare](#ottimizzazioni) il codice.
 
 ## Funzionamento
 I grafici proposti all'utente sono creati _online_, ovvero quando l'utente li richiede, così da circonscrivere solo il periodo che l'utente vuole analizzare.
@@ -52,7 +55,7 @@ Il lavoro è spartito fra server(il sito) e client(l'utente), il server analizza
 Il lavoro del server è fatto da due programmi, Python e PHP. Python analizza il file di log e crea il file per il client, mentre PHP fa da ponte tra server e client. Il client invece necessita solo di un browser.
 
 ### Lato Server
-Il server è il computer o la macchina virtuale dove risiede il sito web. Per funzionare Log to History è neccessario che su di esso siano installati sia Python 2.7 sia PHP >5.3 sia un server web come Apache2, Nginx, Lighttpd. Se si usa node.js come server web vedere [Troubleshots](#troubleshots).
+Il server è il computer o la macchina virtuale dove risiede il sito web. Per far funzionare Log to History è neccessario che su di esso siano installati sia Python 2.7 sia PHP >5.3, sia un server web come Apache2, Nginx, Lighttpd. Se si usa node.js come server web vedere la pagina [Troubleshots](#troubleshots).
 Il formato di log che questi server web usano è il formato _combined_, una possibile riproduzione di una visita potrebbe essere questa:
 
 `145.50.30.131 - [10/Mar/2015:13:55:36 -0100] "GET /second.html HTTP/1.1" 200 2326 "http://www.site.com/first.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"`
@@ -64,7 +67,7 @@ Il primo programma ad essere interpellato sul server è PHP tramite tramite una 
 
 #### main.py
 main.py è lo script che sta alla base di tutti e tre i grafici, è capace di costruire i dati per tutti e tre. Come parametri prende due date e un numero che identifica il tipo di grafico che l'utente ha rihiesto: 0-> tree, 1-> flow, 2->stack.
-Come prima cosa apre il file config.json, in cui ci sono dei parametri settati dal proprietario del sito:
+Come prima cosa apre il file config.json, in cui ci sono dei parametri impostati dal proprietario del sito:
 
 * access_log_location: il percorso dove risiede l'access.log(solitamente in /var/log/_apache_)
 * website_name: il nome del sito(www.sito.com)
@@ -144,19 +147,19 @@ Questo script crea un albero orizzontale, il primo livello di nodi idetnifica l'
 
 #### flow_chart.js
 
-Anche `flow_chart.js` scarica subito il JSON contentete i dati riguardo alle visite. Avviene una fase di analisi e poi di rendering. Il rendering viene affidato a una funzione, `draw()`, che è da considerarsi una sorta black box, in quanto non è stata scritta da me ma presa da un sito: [Football Conferences](http://www.nytimes.com/newsgraphics/2013/11/30/football-conferences/). Questo script quindi prepara i dati per la funzione e poi la chiama. Quello che viene essenzialmente fatto dalla fase di pre-processing è aggiungere delle entry al file JSON, perchè il codice preso è basato per analizzare anni, mentre Log to History deve analizzare misure molto più brevi, come minuti e secondi. Ciò che è invece fatto da `draw()` è disegnare delle linee verticali, rappresentanti i visitatori che sta navigando su un pagina del sito, e delle linee di shift che stanno a significare che il visitatore ha cambiato pagina.
+Anche `flow_chart.js` scarica subito il JSON contentete i dati riguardo alle visite. Avviene una fase di analisi e poi di rendering. Il rendering viene affidato a una funzione, `draw()`, che è da considerarsi una sorta black box, in quanto non è stata scritta da me ma presa da un sito: [Football Conferences](http://www.nytimes.com/newsgraphics/2013/11/30/football-conferences/). Questo script quindi prepara i dati per la funzione e poi la chiama. Quello che viene essenzialmente fatto dalla fase di pre-processing è aggiungere delle entry al file JSON, perchè il codice preso è basato per analizzare anni, mentre Log to History deve analizzare misure molto più brevi, come minuti e secondi. Ciò che è invece fatto da `draw()` è disegnare delle linee verticali, rappresentanti i visitatori che stanno navigando su un pagina del sito, e delle linee di shift che stanno a significare che il visitatore ha cambiato pagina.
 
 #### stack_chart.js
 
-Come flow, `stack_chart.js` scarica il file JSON, da questo file egli ne costruisce un array che verrà renderizzato in seguito. Questo array è costituito da ogni cartella del sito associata ad una lista di intervalli discreti, analizzando le visite nel file JSON viene incrementato un contatore in corrispondenza dell'intervallo corretto e della pagina visitata. Questo array viene poi messo a grafico usando una libreria chiamata [NVD3](https://github.com/novus/nvd3), basata su D3. Il grafico è ad aree sovrapposte, il che significa che nello stesso istante si può osservare sia quanti visitatori erano presenti nelle singole pagine, sia quanti visitatori aveva il sito in generale. Questo grafico è l'unico che può analizzare tempi lunghi come giorni, grazie al fatto di essere dinamico, infatti la grandezza degli intervalli discreti è scelta da`stack_chart.js` in base alla durata del periodo di analisi. Se si analizzano giorni gli intervalli potrebbero essere di 30 minuti, se si analizza un ora potrebbero essere di 10 secondi. 
+Come flow, `stack_chart.js` scarica il file JSON, da questo file egli ne costruisce un array che verrà renderizzato in seguito. Questo array è costituito da ogni cartella del sito associata ad una lista di intervalli discreti, analizzando le visite nel file JSON viene incrementato un contatore in corrispondenza dell'intervallo corretto e della pagina visitata. Questo array viene poi messo a grafico usando una libreria chiamata [NVD3](https://github.com/novus/nvd3), basata su D3. Il grafico è ad aree sovrapposte, il che significa che nello stesso istante si può osservare sia quanti visitatori erano presenti nelle singole pagine, sia quanti visitatori aveva il sito in generale. Questo grafico è l'unico che può analizzare tempi lunghi come giorni, grazie al fatto di essere dinamico, infatti la grandezza degli intervalli discreti è scelta da`stack_chart.js` in base alla durata del periodo di analisi. Se si analizzano giorni gli intervalli potrebbero essere di 30 minuti, se si analizza un'ora potrebbero essere di 10 secondi. 
 
 #### Interfaccia grafica
 
-L'interfaccia grafica di Log to History è composta quasi solamente da un header, il quale permette di scegliere un periodo di analisi degli accessi a un sito. Questo header è costitito da due data input costruiti con la libreria [Datetime Picker](https://github.com/tarruda/bootstrap-datetimepicker) e un pulsante che una volta premuto manda una richesta AJAX al server. Per maneggiare facilmente l'interattività con l'utente è stata usata la libreria [jQuery](https://jquery.com/). Per non sovraccaricare PHP e usarlo solo in qualità di ponte fra client e Python come libreria per gestire l'header come template è stato usato [Handlebars](https://github.com/wycats/handlebars.js/). 
+L'interfaccia grafica di Log to History è composta quasi solamente da un header, il quale permette di scegliere un periodo di analisi degli accessi a un sito. Questo header è costitito da due data input costruiti con la libreria [Datetime Picker](https://github.com/tarruda/bootstrap-datetimepicker) e un pulsante che una volta premuto manda una richesta AJAX al server. Per maneggiare facilmente l'interattività con l'utente è stata usata la libreria [jQuery](https://jquery.com/). Per non sovraccaricare PHP, usandolo solo in qualità di ponte fra client e Python, come libreria per gestire l'header come template è stato usato [Handlebars](https://github.com/wycats/handlebars.js/). 
 
 ## Ottimizzazioni
 
-Dopo la fase di creazione di Log to History è avvenuta anche una fase di testing e di ottimizazione delle performance. Riguardo a main.py è stato usato questo strumento: [LineProfiler](https://github.com/rkern/line_profiler) che permette di vedere quanto tempo viene speso per ogni riga di una funzione che si vuole analizzare. In particolare usando questo tool si è visto che main.py trascorreva molto tempo a convertire delle stringhe in date con il metodo `time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S')` è stato quindi sostituito da uno molto più efficente:
+Dopo la fase di creazione di Log to History è avvenuta anche una fase di testing e di ottimizazione delle performance. Riguardo a main.py è stato usato questo strumento: [LineProfiler](https://github.com/rkern/line_profiler) che permette di vedere quanto tempo viene speso per ogni riga di una funzione che si vuole analizzare. In particolare usando questo tool si è visto che main.py trascorreva molto tempo a convertire delle stringhe in date con il metodo `time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S')`. É stato quindi sostituito da uno molto più efficente:
 
 ```python
 month_map = {'Jan': 1, 'Feb': 2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7, 
@@ -170,7 +173,7 @@ def apachetime(s):
          int(s[12:14]), int(s[15:17]), int(s[18:20]))
 ```
 
-Sempre per ottimizzare main.py nella fase di scansione del log(la piú pesante e lenta) se la data di inizio log é distante da quella da dove parte l'analisi viene praticamente saltata e non analizzata la prima parte del file di log, risparmiando molto tempo.
+Sempre per ottimizzare main.py nella fase di scansione del log(la piú pesante e lenta), se la data di inizio log é distante da quella da dove parte l'analisi, la prima parte del log non viene presa in considerazione risparmiando molto tempo.
 
 ```python
 with open(log_dir, 'rb') as fh: #binary read
@@ -185,16 +188,16 @@ with open(log_dir, 'rb') as fh: #binary read
 
 Basta poi chiamare `access_log_file.seek(first_seek_jump, os.SEEK_SET)` e si sará evitato di analizzare la prima parte non necessaria del file di log.
 
-Per analizzare gli script lato browser invece è stata usata la console di Google Chrome nella sezione di profiling, essa mostra il tempo speso per ogni funzione. Nel nostro caso vi era un ammontare di tempo speso nella funzione `findClosest()` che in un dizionario, oggetto non ordinato in JavaScript, restituisce l'elemento dopo uno selezionato.
+Per analizzare gli script lato browser invece è stata usata la console di Google Chrome nella sezione di profiling, essa mostra il tempo speso per ogni funzione. Nel nostro caso vi era un grosso ammontare di tempo speso nella funzione `findClosest()`. Il suo ruolo era, in un dizionario, oggetto non ordinato in JavaScript, restituire l'elemento dopo uno selezionato.
 
 ```javascript
-function findClosest(array, id, increasing) {
+function findClosest(associative_array, id, increasing) {
         /* method that, in a dictionary(associative array), finds the element after the passed one */
         var step = increasing ? 1 : -1; //search next or previous
         var i=+id+step;
-        if( array[id]!="" && array[id]!==undefined ){
+        if( associative_array[id]!="" && associative_array[id]!==undefined ){
             for(; i>=0 && i<=o; i+=step ){
-                if( array[i] && array[i]!="" ){
+                if( associative_array[i] && associative_array[i]!="" ){
                     return i;
                 }
             }
@@ -202,16 +205,15 @@ function findClosest(array, id, increasing) {
     }
 ```
 
-Questo metodo è altamente inefficente perchè per cercare l'elemento dopo procede a passi piccoli(+1, -1) controllando se appunto esiste un elemento, il metodo è stato sostituito da un array in cui ad ogni elemento dell'array è associato un nuovo indice: 
+Questo metodo è altamente inefficente perchè per cercare l'elemento si procede a passi piccoli(+1, -1) controllando se appunto esiste un elemento, il metodo è stato sostituito da un array in cui ad ogni elemento dell'array è associato un indice: 
 
 ```javascript
-var array_sorted_keys = Object.keys(array).sort( function(a,b) { //sorting object elements for fast access to the next element
+var array_sorted_keys = Object.keys(associative_array).sort( function(a,b) { //sorting object elements for fast access to the next element
     return +b - +a; //desc ordering
 });
 ```
 
 Dunque per accedere all'elemento successivo basta chiedere l'indice dell'elemento corrente con `current_key_index = entry_sorted_keys.indexOf(key)` e eseguire `array_sorted_keys[current_key_index +1]`
-
 
 ## Problemi
 
