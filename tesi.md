@@ -40,10 +40,10 @@ In questo esempio viene analizzato invece solo un breve periodo di un'ora, e vie
 
 ## Sviluppo
 
-### fase iniziale
+### Fase iniziale
 Come fase iniziale prima ancora di capire il nostro obiettivo abbiamo studiato e installato molti [analizzatori](#altri-analizzatori-open-source) di access.log open-source che si trovano in rete, li abbiamo confrontati e siamo giunti alla concolusione che l'unica cosa che mancava era uno strumento di analisi microscopica che tenesse conto dell'utente, che mostrasse come si muove all'interno di un sito. Da qui è nata l'idea per lo sviluppo di Log to History. Dopo aver scoperto il nostro obiettivo abbiamo cominciato a studiare il metodo migliore per realizzarlo, quali linguaggi usare, come renderizzare i dati, come interfacciarsi con l'utente. Siamo quindi arrivati ad utilizzare Python lato Server, per la sua semplicità e velocità. PHP come intermediario con il browser dell'utente, si sarebbe potuto riutilizzare Python come web-server attreverso dei framework(esempo: Django, Flask, Tornado) ma secondo [alcune statistiche](http://news.netcraft.com/archives/2015/05/19/may-2015-web-server-survey.html) la maggior parte degli utenti usa ancora la soluzione Apache/PHP come server web. [D3](https://github.com/mbostock/d3) per il rendering dei dati su grafico. 
 
-### fase di sviluppo
+### Fase di sviluppo
 Durante la fase di sviluppo abbiamo usato come editor di codice [Sublime 3](https://www.sublimetext.com/3), come strumento di controllo versione Git assieme a Github, sul quale si trova tutto il [codice sorgente](https://github.com/Naramsim/Log-to-History/). Per testare il prodotto si è usato un [server](https://mtgfiddle.me/tirocinio/pezze/) su DigitalOcean e come access.log il file di log di un sito molto visitato: [Atletica.me](http://atletica.me/).
 
 ## Funzionamento
@@ -170,17 +170,17 @@ def apachetime(s):
          int(s[12:14]), int(s[15:17]), int(s[18:20]))
 ```
 
-Sempre per ottimizzare main.py nella fase di scansione del log(la piú pesante e lenta) se la data di inizio log é distante da quella da dove parte l'analisi viene praticamente saltato e non analizzata la prima parte del file di log, risparmiando molto tempo.
+Sempre per ottimizzare main.py nella fase di scansione del log(la piú pesante e lenta) se la data di inizio log é distante da quella da dove parte l'analisi viene praticamente saltata e non analizzata la prima parte del file di log, risparmiando molto tempo.
 
 ```python
 with open(log_dir, 'rb') as fh: #binary read
-        first_line_of_log = next(fh).decode() #first line of log
-        first_time_of_log = int(apachetime( first_line_of_log.split("[")[1] ).strftime("%s")) #first time in timestamp
-        fh.seek(-2048, os.SEEK_END) #current pointer location is moved 2048 bytes before the end of the file
-        last_line_of_log = fh.readlines()[-1].decode() #last line of log
-        last_time_of_log = int(apachetime( last_line_of_log.split("[")[1] ).strftime("%s")) #last time in timestamp
-        start_percentage = (int(start_point.strftime("%s")) - first_time_of_log) / float(last_time_of_log - first_time_of_log)
-        first_seek_jump = int((start_percentage - 0.05) * log_size)
+    first_line_of_log = next(fh).decode() #first line of log
+    first_time_of_log = int(apachetime( first_line_of_log.split("[")[1] ).strftime("%s")) #first time in timestamp
+    fh.seek(-2048, os.SEEK_END) #current pointer location is moved 2048 bytes before the end of the file
+    last_line_of_log = fh.readlines()[-1].decode() #last line of log
+    last_time_of_log = int(apachetime( last_line_of_log.split("[")[1] ).strftime("%s")) #last time in timestamp
+    start_percentage = (int(start_point.strftime("%s")) - first_time_of_log) / float(last_time_of_log - first_time_of_log)
+    first_seek_jump = int((start_percentage - 0.05) * log_size)
 ```
 
 Basta poi chiamare `access_log_file.seek(first_seek_jump, os.SEEK_SET)` e si sará evitato di analizzare la prima parte non necessaria del file di log.
