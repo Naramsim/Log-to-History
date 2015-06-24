@@ -169,7 +169,22 @@ def apachetime(s):
     return datetime.datetime(int(s[7:11]), month_map[s[3:6]], int(s[0:2]), \
          int(s[12:14]), int(s[15:17]), int(s[18:20]))
 ```
-         
+
+Sempre per ottimizzare main.py nella fase di scansione del log(la piú pesante e lenta) se la data di inizio log é distante da quella da dove parte l'analisi viene praticamente saltato e non analizzata la prima parte del file di log, risparmiando molto tempo.
+
+```python
+with open(log_dir, 'rb') as fh: #binary read
+        first_line_of_log = next(fh).decode() #first line of log
+        first_time_of_log = int(apachetime( first_line_of_log.split("[")[1] ).strftime("%s")) #first time in timestamp
+        fh.seek(-2048, os.SEEK_END) #current pointer location is moved 2048 bytes before the end of the file
+        last_line_of_log = fh.readlines()[-1].decode() #last line of log
+        last_time_of_log = int(apachetime( last_line_of_log.split("[")[1] ).strftime("%s")) #last time in timestamp
+        start_percentage = (int(start_point.strftime("%s")) - first_time_of_log) / float(last_time_of_log - first_time_of_log)
+        first_seek_jump = int((start_percentage - 0.05) * log_size)
+```
+
+Basta poi chiamare `access_log_file.seek(first_seek_jump, os.SEEK_SET)` e si sará evitato di analizzare la prima parte non necessaria del file di log.
+
 Per analizzare gli script lato browser invece è stata usata la console di Google Chrome nella sezione di profiling, essa mostra il tempo speso per ogni funzione. Nel nostro caso vi era un ammontare di tempo speso nella funzione `findClosest()` che in un dizionario, oggetto non ordinato in JavaScript, restituisce l'elemento dopo uno selezionato.
 
 ```javascript
