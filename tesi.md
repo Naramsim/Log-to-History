@@ -40,7 +40,7 @@ I tre grafici di Log to History hanno i seguenti nomi: tree, flow e stack.
 ### Tree
 Tree mostra un albero che si sviluppa lateralmente, esso fa combaciare ad ogni visitatore un set di pagine che sono state visualizzate _direttamente_ dall'utente, direttamente significa che l'utente proviene da un altro sito, come Google, Bing e altri, o che ha caricato il sito dalla barra degli indirizzi del browser. Ogni visita diretta è dunque rappresentata da un nodo, che ha come figli le pagine visitate dall'utente che ha cliccato su un link del sito che si sta analizzando. Questo grafico rappresenta la cronologia di un utente calcolata secondo i movimenti via link. Passando sopra ad ogni nodo che identifica un visitatore si può vedere l'user agent, se è identificato come un bot o un crawler il nodo verrà colorato di giallo. Mentre se si passa sopra una pagina visitata da un utente comparirà la data della visita.
 
-[<img src="https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_tree.png"/>](#tree-graph "Tree Graph")
+[<img src="http://i.imgur.com/mW1XgZb.png"/>](#tree-graph "Tree Graph")
 
 Questo grafico é la rappresentazione di Tree, si vedono quindi molti IP, e se un IP viene cliccato si aprono le pagine che ha richiesto direttamente. In questo caso 7.50.142.24(il penultimo IP analizzato) ha comiciato a visitare il sito dalla pagina _/_, che é l'home-page del sito, si é quindi spostato a _/atleta_ cliccando qualche link nella home-page, poi si é spostato su _atleta/Levi-Roche-Mandji/150970_. Nel caso di 94.32.224.201(l'ultimo IP), nell'ultima parte della sua visita partendo da _/societa/1810_ egli ha richesto 5 pagine cliccando su 5 link diversi probabilmente aprendo le nuove pagine come nuove tab del browser.
 
