@@ -40,7 +40,7 @@ I tre grafici di Log to History hanno i seguenti nomi: tree, flow e stack.
 ### Tree
 Tree mostra un albero che si sviluppa lateralmente, esso fa combaciare ad ogni visitatore un set di pagine che sono state visualizzate _direttamente_ dall'utente, direttamente significa che l'utente proviene da un altro sito, come Google, Bing e altri, o che ha caricato il sito dalla barra degli indirizzi del browser. Ogni visita diretta è dunque rappresentata da un nodo, che ha come figli le pagine visitate dall'utente che ha cliccato su un link del sito che si sta analizzando. Questo grafico rappresenta la cronologia di un utente calcolata secondo i movimenti via link. Passando sopra ad ogni nodo che identifica un visitatore si può vedere l'user agent, se è identificato come un bot o un crawler il nodo verrà colorato di giallo. Mentre se si passa sopra una pagina visitata da un utente comparirà la data della visita.
 
-[<img src="http://i.imgur.com/mW1XgZb.png"/>](#tree-graph "Tree Graph")
+![Tree Graph](http://i.imgur.com/mW1XgZb.png "Tree Graph")
 
 Questo grafico é la rappresentazione di Tree, si vedono quindi molti IP, e se un IP viene cliccato si aprono le pagine che ha richiesto direttamente. In questo caso 7.50.142.24(il penultimo IP analizzato) ha comiciato a visitare il sito dalla pagina _/_, che é l'home-page del sito, si é quindi spostato a _/atleta_ cliccando qualche link nella home-page, poi si é spostato su _atleta/Levi-Roche-Mandji/150970_. Nel caso di 94.32.224.201(l'ultimo IP), nell'ultima parte della sua visita partendo da _/societa/1810_ egli ha richesto 5 pagine cliccando su 5 link diversi probabilmente aprendo le nuove pagine come nuove tab del browser.
 
@@ -57,11 +57,11 @@ Questi due grafici sono utili per avere una vista microscopica di un determinato
 ### Stack
 Stack è un grafico che si concentra sulle visite non tenendo conto di chi ha fatto la visita. E' l'unico grafico che si discosta dagli altri. Esso mostra un grafico ad aree sovrapposte, ogni area di colore diverso rappresenta il quantitativo di visite su una determinata cartella nel tempo. Anche questo grafico usa le cartelle al posto delle singole pagine web, per non essere troppo particolareggiato e più generale possibile. La sovrapposizione delle varie aree permette inoltre di visualizzare anche il numero complessivo di utenti su tutto il sito in un dato istante. Sono presenti dei controlli nella parte superiore del grafico, a destra viene permesso di passare fra il quantitativo di visite alla percentuale delle visite cliccando il pulsante "expanded", mentre se viene premuto "stream" i dati verranno organizzati attorno all'asse x e non solo al di sopra, creando un grafico organico e di flusso.
 
-![Stack Chart](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_stack.png "Stack Chart")
+![Stack Chart](http://i.imgur.com/672XWzU.png "Stack Chart")
 
 Sopra viene mostrato un esempio prolungato di uno stack chart, dalle tre di mattina fino alle venti di sera, si puó notare come in generale gli utenti tendano a crescere durante la mattinata per poi stabilizzarsi. Vi sono anche alcuni picchi che probabilmente sono dovuti ad attivitá di indicizzazione di spider e crawler. Si puó notare anche che le pagine piú richieste sono quelle che risiedono nella cartella _/atleta_.
 
-![Stack Chart](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_stack3.png "Stack Chart")
+![Stack Chart](http://i.imgur.com/IEy1Iti.png "Stack Chart")
 
 In questo esempio viene analizzato invece solo un breve periodo di un'ora, e viene usato il metodo _Expanded_ che mostra la percentuale di utenti per ogni cartella del sito. Si puó vedere che nella prima mezz'ora gli utenti sono prevalentemente su _/atleta_, mentre nella seconda mezz'ora tendono a crescere le visite su _/confronto_ e sulla root del sito(_/_), ovvero la home-page.
 
