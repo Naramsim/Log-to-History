@@ -96,7 +96,7 @@ Il primo programma ad essere interpellato sul server è PHP tramite tramite una 
 main.py è lo script che sta alla base di tutti e tre i grafici, è capace di costruire i dati per tutti e tre. Come parametri prende due date e un numero che identifica il tipo di grafico che l'utente ha rihiesto: 0-> tree, 1-> flow, 2->stack.
 Come prima cosa apre il file config.json, in cui ci sono dei parametri impostati dal proprietario del sito:
 
-* access_log_location: il percorso dove risiede l'access.log(solitamente in /var/log/_apache_)
+* access\_log\_location: il percorso dove risiede l'access.log(solitamente in /var/log/_apache_)
 * website_name: il nome del sito(www.sito.com)
 * folder_level: la profodità dalle cartelle da analizzare, ad esempio se impostato ad 1 la seguente richiesta www.sito/cartella/cartella2/file.html verrà cosiderata solo fino a /cartella, se impostato a due, viene considerata fino a /cartella/cartella2
 * blacklist_folders: questa è una blacklist delle cartelle che non si vuole mostrare al pubblico, come portali di amministrazione o di statistiche
