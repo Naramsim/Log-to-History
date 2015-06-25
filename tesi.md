@@ -47,7 +47,7 @@ Questo grafico é la rappresentazione di Tree, si vedono quindi molti IP, e se u
 ### Flow
 Flow è un diagramma di flusso che sviluppa verticalmente, il suo scopo è quello di mostrare i cambiamenti di pagina di un utente. In Flow ci sono tante colonne quante cartelle ci sono su un sito, all'interno di queste colonne sono rappresentati i visitatori come linee verticali, quando una linea cambia colonna significa che il visitatore ha cambiato pagina durante la sua navigazione. E' bene precisare che l'analisi in questo grafico non comprende tutte le pagine di un sito ma solo le cartelle dove sono residenti le pagine web. Questo significa che se un visitatore è sulla pagina _sito/cartella/index.html_, il grafico mostrerà l'utente come se stesse visitando _cartella/_. Si ha quindi una generalizzazione di cosa i visitatori stanno navigando. E' presente pure una casella di ricerca in cui si può cercare ed evidenziare un certo visitatore. 
 
-![Flow Graph](https://raw.githubusercontent.com/Naramsim/Log-to-History/master/img/Screenshot_flow.png "Flow Graph")
+![Flow Graph](http://i.imgur.com/US2Slyk.png "Flow Graph")
 
 In questo esempio si possono notare i visitatori di un sito del giorno 8 Giugno dalle 19.07 alle 19.10, é evidenziato un visitatore che é stato cercato tramite la search-box in alto a sinistra. Il visitatore é identificato dal suo indirizzo IP e la sua cronologia di un colore arancio. Si puó capire che il visitatore ha abbandonato una pagina un _/confronto_ verso le 19.50 per andare su una pagina in _/atleta_, poi é ritornato su _/confronto_ e in fine é ritornato in _/atleta_.
 
