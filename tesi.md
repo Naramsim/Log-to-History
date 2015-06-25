@@ -34,7 +34,7 @@ Indice:
 ## Introduzione
 
 Log to history è uno strumento che permette di analizzare le visite di un determinato sito.
-Esso è composto da tre grafici che vengono costruiti andando ad analizzare un file, noto come access.log, che registra tutte le visite da parte di utenti su un determinato sito web. Di questi grafici i primi due tendono a dare una vista microscopica, ovvero sono più efficaci per analizzare brevi periodi di tempo, mentre l'ultimo grafico è adattabile ad un qualisasi periodo, sia di poche ore sia di più giorni. L'idea per la creazione di Log to History è venuta perchè sul web mancano degli strumenti di analisi microscopica e di analisi del flusso di utenti. Log to History infatti con i primi due grafici mostra la cronologia delle pagine visitate da singoli utenti, ricreando la storia di un utente su un sito web. E' quindi uno strumento molto potente in quanto lascia intendere quando l'utente cambia pagina e che pagina gli viene servita.
+Esso è composto da tre grafici che vengono costruiti andando ad analizzare un file, noto come access.log, che registra tutte le visite da parte di utenti su un determinato sito web. Di questi grafici i primi due tendono a dare una vista microscopica, ovvero sono più efficaci per analizzare brevi periodi di tempo, mentre l'ultimo grafico è adattabile ad un qualsiasi periodo, sia di poche ore sia di più giorni. L'idea per la creazione di Log to History è venuta perchè sul web mancano degli strumenti di analisi microscopica e di analisi del flusso di utenti. Log to History infatti con i primi due grafici mostra la cronologia delle pagine visitate da singoli utenti, ricreando la storia di un utente su un sito web. E' quindi uno strumento molto potente in quanto lascia intendere quando l'utente cambia pagina e che pagina gli viene servita.
 I tre grafici di Log to History hanno i seguenti nomi: tree, flow e stack. 
 
 ### Tree
@@ -78,7 +78,7 @@ Ogni settimana dopo ogni aggiunta al codice é avvenuta una fase di testing, fas
 
 ## Funzionamento
 I grafici proposti all'utente sono creati _online_, ovvero quando l'utente li richiede, così da circonscrivere solo il periodo che l'utente vuole analizzare.
-Il lavoro è spartito fra server(il sito) e client(l'utente), il server analizza il file di accesso al sito(access.log), seleziona il periodo richisto dall'utente e prepara per il client un file di piccole dimensioni in formato JSON, così da rendere il download veloce, che sarà ri-analizzato e renderizzato dal browser. 
+Il lavoro è spartito fra server(il sito) e client(l'utente), il server analizza il file di accesso al sito(access.log), seleziona il periodo richiesto dall'utente e prepara per il client un file di piccole dimensioni in formato JSON, così da rendere il download veloce, che sarà ri-analizzato e renderizzato dal browser. 
 Il lavoro del server è fatto da due programmi, Python e PHP. Python analizza il file di log e crea il file per il client, mentre PHP fa da ponte tra server e client. Il client invece necessita solo di un browser.
 
 ### Lato Server
@@ -186,7 +186,7 @@ L'interfaccia grafica di Log to History è composta quasi solamente da un header
 
 ## Ottimizzazioni
 
-Dopo la fase di creazione di Log to History è avvenuta anche una fase di testing e di ottimizazione delle performance. Riguardo a main.py è stato usato questo strumento: [LineProfiler](https://github.com/rkern/line_profiler) che permette di vedere quanto tempo viene speso per ogni riga di una funzione che si vuole analizzare. In particolare usando questo tool si è visto che main.py trascorreva molto tempo a convertire delle stringhe in date con il metodo `time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S')`. É stato quindi sostituito da uno molto più efficente:
+Dopo la fase di creazione di Log to History è avvenuta anche una fase di testing e di ottimizzazione delle performance. Riguardo a main.py è stato usato questo strumento: [LineProfiler](https://github.com/rkern/line_profiler) che permette di vedere quanto tempo viene speso per ogni riga di una funzione che si vuole analizzare. In particolare usando questo tool si è visto che main.py trascorreva molto tempo a convertire delle stringhe in date con il metodo `time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S')`. É stato quindi sostituito da uno molto più efficente:
 
 ```python
 month_map = {'Jan': 1, 'Feb': 2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7, 
