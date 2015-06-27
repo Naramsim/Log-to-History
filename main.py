@@ -305,17 +305,12 @@ def get_requests():
             compiled_line = find(pat, line, None)
             if compiled_line:
                 compiled_line = compiled_line[0] # convert our [("","","")] to ("","","")
-                request_time = apachetime(compiled_line[1])
-                #print request_time
-                #request_time_ = time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S') # this call loses the time zone, but it is quicker than using dateutil
-                #print request_time
-                #print request_time_
-                #print "--"
-                if ( start_point <= request_time <= end_point ) and ( not any(black in compiled_line[2] for black in black_folders ) ):
-                    if ( any(x in compiled_line[2] for x in filters) or (compiled_line[2].endswith('/')) or (('.') not in compiled_line[2]) ):
+                if ( any(x in compiled_line[2] for x in filters) or (compiled_line[2].endswith('/')) or (('.') not in compiled_line[2]) ):
+                    request_time = apachetime(compiled_line[1])
+                    if ( not any(black in compiled_line[2] for black in black_folders ) ) and ( start_point <= request_time <= end_point ):
                         requests.append(compiled_line)
-                elif request_time > end_point:
-                    return requests
+                    if request_time > end_point:
+                        return requests
     return requests #list of all access log lines
 
 def find(pat, text, match_item):
