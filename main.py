@@ -16,7 +16,8 @@ Every line represent a user history on a specific site, the line can switch colu
 
 '''
 
-import re, sys, json, csv, socket, time, datetime, os
+import re, sys, json, csv, socket, time, datetime, os, httplib
+from urlparse import urlparse
 from dateutil import parser
 from collections import OrderedDict
 
@@ -38,6 +39,7 @@ else: # default: 1 hour ago
 to_render = int(to_render)
 my_site = config["website_name"]
 protocol = config["protocol_used"]
+bots_omitted = config["omit_malicious_bots"]
 log_dir = config["access_log_location"]
 filters = config["whitelist_extensions"] #extensions of pages that we want to track
 black_folders = config["blacklist_folders"]
@@ -81,10 +83,12 @@ def get_user_story():
         story["name"] = "root_log" # root of the three
         story["children"] = [] # will be filled by IPs
 
-        #data structures needed for story.tsv
-        tsv_list = [] #list that will be convert to a TSV file
-        hours = [] #list that contains every hour while there was a page request, these hours will be keys(first row) of our tsv file
+        #data structures needed for story.json
+        json_list = [] #list that will be convert to a JSON file
+        hours = [] #list that contains every hour while there was a page request, these hours will be keys(first row) of our json file
         hour_changed = False #boolean needed to understand if the hour has changed, i.e.: from 10.57 to 11.01
+        existing_folders = []
+        not_existing_folders = []
 
         requests = get_requests() #list with all lines of the access log
         if len(requests)>4000 and to_render<2:
@@ -122,29 +126,36 @@ def get_user_story():
                 else:   #if not, i try to chain it
                     attach_node( story["children"][IP_index]["children"], req )
             if to_render > 0:
-                #preparing TSV flow-chart and JSON stack
-                tsv_dict = OrderedDict() #dict used to store the number(name) of an IP, pages visited by him and time of the visits
-                full_data = parser.parse(req[1],fuzzy=True) #=datetime.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') #OPTIMIZE
+                #preparing JSON flow-chart and JSON stack
+                json_dict = OrderedDict() #dict used to store the number(name) of an IP, pages visited by him and time of the visits
                 folder_requested = get_folder(req[2])
-                if not tsv_list:
-                    first_request_time = full_data
-                time_elapsed_since_first = (full_data - first_request_time).seconds + ((full_data - first_request_time).days * 86400) #seconds elapsed since first request found in the accesslog
-                hours.append(time_elapsed_since_first)
-                if is_ip_new:
-                    tsv_dict["name"] = req[0]
-                    tsv_dict["team"] = req[0]
-                    tsv_dict[time_elapsed_since_first] = folder_requested # key:time value:folder_requested
-                    tsv_list.append(tsv_dict)
-                else:
-                    current_dict = search_in_list(req[0],tsv_list) #selects the dict of a specified IP #OPTIMIZE
-                    last_key = next(reversed(current_dict)) # gets last element(greater time)
-                    if my_site in req[5]: #if the referrer comes from our site
-                        referrer_folder = get_folder( re.sub('^'+protocol+my_site, '', req[5]) ) 
-                        if (current_dict[last_key] != referrer_folder) and (referrer_folder != folder_requested) and (not (+time_elapsed_since_first-2 < +last_key)): #if referrer is not equal to the last element
-                            if not any(black in referrer_folder for black in black_folders ): # and not in black list
-                                mean = (+last_key + +time_elapsed_since_first)/2 
-                                current_dict[mean] = referrer_folder # it adds the referrer folder 
-                    current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
+                if bots_omitted:
+                    if (not folder_requested in existing_folders) and (not folder_requested in not_existing_folders):
+                        if checkUrl(protocol + my_site + folder_requested):
+                            existing_folders.append(folder_requested)
+                        else:
+                            not_existing_folders.append(folder_requested)
+                if (not bots_omitted) or (folder_requested in existing_folders):
+                    full_data = parser.parse(req[1],fuzzy=True) #=datetime.strptime(req[1][:-6], '%d/%b/%Y:%H:%M:%S') #OPTIMIZE
+                    if not json_list:
+                        first_request_time = full_data
+                    time_elapsed_since_first = (full_data - first_request_time).seconds + ((full_data - first_request_time).days * 86400) #seconds elapsed since first request found in the accesslog
+                    hours.append(time_elapsed_since_first)
+                    if is_ip_new:
+                        json_dict["name"] = req[0]
+                        json_dict["team"] = req[0]
+                        json_dict[time_elapsed_since_first] = folder_requested # key:time value:folder_requested
+                        json_list.append(json_dict)
+                    else:
+                        current_dict = search_in_list(req[0],json_list) #selects the dict of a specified IP #OPTIMIZE
+                        last_key = next(reversed(current_dict)) # gets last element(greater time)
+                        if my_site in req[5]: #if the referrer comes from our site
+                            referrer_folder = get_folder( re.sub('^'+protocol+my_site, '', req[5]) ) 
+                            if (current_dict[last_key] != referrer_folder) and (referrer_folder != folder_requested) and (not (+time_elapsed_since_first-2 < +last_key)): #if referrer is not equal to the last element
+                                if not any(black in referrer_folder for black in black_folders ): # and not in black list
+                                    mean = (+last_key + +time_elapsed_since_first)/2 
+                                    current_dict[mean] = referrer_folder # it adds the referrer folder 
+                        current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
 
 
             # preparing JSON stack chart
@@ -155,7 +166,7 @@ def get_user_story():
                 folder_dict["values"] = []
                 stack_list.append(folder_dict)
 
-            if end_interval == -1: #todo change tsv_list
+            if end_interval == -1: #todo change json_list
                 end_interval = first_request_time + datetime.timedelta(seconds=scanning_interval) #10 seconds interval
             if full_data <= end_interval:
                 for folder in stack_list:
@@ -179,7 +190,7 @@ def get_user_story():
             # CREATES JSON for Flow Chart
             flow_json = {}
             flow_json["start_time"] = int(first_request_time.strftime("%s")) * 1000
-            flow_json["data"] = tsv_list
+            flow_json["data"] = json_list
             JSON_to_write = json.dumps( flow_json, sort_keys=False)
             file_ = open('data/flow.json', 'w')
             file_.write(JSON_to_write)
@@ -189,7 +200,7 @@ def get_user_story():
             stack_json = {}
             stack_json["start_time"] = int(first_request_time.strftime("%s")) * 1000 
             stack_json["interval_processed"] = int( hours[-1] ) #number of seconds that the script has processed (start - end)
-            stack_json["data"] = tsv_list 
+            stack_json["data"] = json_list 
             JSON_to_write = json.dumps( stack_json, sort_keys=False)
             file_ = open('data/stack.json', 'w')
             file_.write(JSON_to_write)
@@ -322,6 +333,16 @@ def find(pat, text, match_item):
         return match
     else:
         return False
+
+def checkUrl(url):
+    '''
+    method that check if a webpage exists or not
+    '''
+    p = urlparse(url)
+    conn = httplib.HTTPConnection(p.netloc)
+    conn.request('HEAD', p.path)
+    resp = conn.getresponse()
+    return resp.status < 400 and resp.status != 302
 
 #NOT USED
 def get_entry(requests,index):

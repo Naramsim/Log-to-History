@@ -1,9 +1,10 @@
 {
   "whitelist_extensions": [".html",".htm",".php"],
-  "blacklist_folders": ["phpmyadmin","confronto"],
+  "blacklist_folders": ["phpmyadmin","backdoor","404"],
   "rewrite_rules": [],
   "folder_level": 1,
-  "access_log_location": "atletica2.log",
+  "access_log_location": "access3.log",
   "website_name": "://atletica.me",
-  "protocol_used": "http"
+  "protocol_used": "http",
+  "omit_malicious_bots": true
 }
