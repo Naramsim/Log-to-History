@@ -33,6 +33,7 @@ In this case the script is called "main.py", and the Javascript code is in "flow
 		<title>Log To History</title>
         <link href="css/nfl.css" rel="stylesheet" >
         <link href="https://mtgfiddle.me/tirocinio/pezze/css/chosen.min.css" rel="stylesheet" > <!-- Chosen Pluging css-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js" type="text/javascript"></script> <!-- Moment -->
         <script src="https://mtgfiddle.me/tirocinio/pezze/chosen.jquery.min.js" type="text/javascript"></script><!-- Chosen Pluging (for button and search interaction)-->
         <script src="js/flow_chart.js" type="text/javascript"></script>
 

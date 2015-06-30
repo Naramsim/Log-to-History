@@ -33,6 +33,7 @@ In this case the script is called "main.py", and the Javascript code is in "tree
 		<title>Log to History</title>
 		<link href='https://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'> <!-- Font Google Open Sans -->
 		<link href='css/tree.css' rel='stylesheet' type='text/css'>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js" type="text/javascript"></script> <!-- Moment -->
 		<script src="https://mtgfiddle.me/tirocinio/pezze/d3tip.js" type="text/javascript"></script> <!-- Bootstrap -->
 		<script src="js/tree_graph.js" type="text/javascript"></script>
 	</head>

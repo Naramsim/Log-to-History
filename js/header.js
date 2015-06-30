@@ -12,4 +12,23 @@ function end_spinner() {
 	$("#loader").removeClass("loader");
 	$("#explanation").text("Process ended");
 }
-	
+
+function check_dates() {
+	s = moment( $("#start_date").val() , "DD/MM/YYYY@HH:mm:ss");
+	e = moment( $("#end_date").val() , "DD/MM/YYYY@HH:mm:ss");
+	if ( e.diff(s) > 3605000 ) {
+		$("#start_date, #end_date").css("background-color","rgba(255, 0, 0, 0.1)");
+		$("#explanation").text("Often is better to check only a little amount of time with this graph (1h)");
+	}else {
+		$("#start_date, #end_date").css("background-color","");
+		$("#explanation").text("Waiting button pressing")
+	}
+}
+
+
+
+$(document).ready(function(){
+	if(typeof moment !== 'undefined') {
+		setInterval(function() { check_dates(); }, 700); //must use a timer check because all input events are overridden by datetime-picker library
+	}
+});
