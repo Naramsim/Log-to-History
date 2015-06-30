@@ -21,11 +21,8 @@ function check_dates() {
 		$("#explanation").text("Often is better to check only a little amount of time with this graph (1h)");
 	}else {
 		$("#start_date, #end_date").css("background-color","");
-		$("#explanation").text("Waiting button pressing")
 	}
 }
-
-
 
 $(document).ready(function(){
 	if(typeof moment !== 'undefined') {

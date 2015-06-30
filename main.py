@@ -80,7 +80,7 @@ def get_user_story():
         
         #data structures needed for accesslog.json
         story = {} #dict of lists of dicts, this structure will be transfomed in the JSON file needed by index.php
-        story["name"] = "root_log" # root of the three
+        story["name"] = my_site # root of the three
         story["children"] = [] # will be filled by IPs
 
         #data structures needed for story.json

@@ -36,6 +36,7 @@ In this case the script is called "main.py", and the Javascript code is in "tree
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js" type="text/javascript"></script> <!-- Moment -->
 		<script src="https://mtgfiddle.me/tirocinio/pezze/d3tip.js" type="text/javascript"></script> <!-- Bootstrap -->
 		<script src="js/tree_graph.js" type="text/javascript"></script>
+		
 	</head>
 	<body> 
 		<script>
@@ -56,6 +57,6 @@ In this case the script is called "main.py", and the Javascript code is in "tree
 		  });
 		})();
 		</script>
-	    <div id="graph" style="position:absolute;top:90px;width:100%;height:80%;"></div>
+	    <div id="graph"></div>
 	</body>
 <html>
