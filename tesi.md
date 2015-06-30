@@ -101,6 +101,7 @@ Come prima cosa apre il file config.json, in cui ci sono dei parametri impostati
 * folder_level: la profodità dalle cartelle da analizzare, ad esempio se impostato ad 1 la seguente richiesta www.sito/cartella/cartella2/file.html verrà cosiderata solo fino a /cartella, se impostato a due, viene considerata fino a /cartella/cartella2
 * blacklist_folders: questa è una blacklist delle cartelle che non si vuole mostrare al pubblico, come portali di amministrazione o di statistiche
 * whitelist_extensions: qui vengono definiti i file che si vogliono analizzare, tipicamente si scelgono i file .html, .php, tralasciando le immagini, i fogli di stile e gli script
+* omit_malicious_bots: se _true_ lo script non esaminerà i tentativi di falsi login a pagine inesistenti del sito
 
 Come seconda cosa lo script esegue `get_requests()` e apre il file di log, lo legge riga per riga per non occupare RAM preziosa e decide se la riga deve essere tenuta o scartata, perchè fuori range, controllando se la data è nell'intervallo richiesto, perchè appartiene alla blacklist o non appartiene alla whitelist.
 Viene poi eseguito anche un controllo per evitare di passare al browser un file troppo lungo: se viene richiesto flow o tree e il numero di accessi è troppo alto per essere renderizzato da un browser viene lanciato un errore e il programma si ferma. 
