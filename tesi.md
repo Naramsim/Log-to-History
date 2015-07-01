@@ -83,6 +83,7 @@ Il lavoro del server è fatto da due programmi, Python e PHP. Python analizza il
 
 ### Lato Server
 Il server è il computer o la macchina virtuale dove risiede il sito web. Per far funzionare Log to History è neccessario che su di esso siano installati sia Python 2.7 sia PHP >5.3, sia un server web come Apache2, Nginx, Lighttpd. Se si usa node.js come server web vedere la pagina [Troubleshots](#troubleshots).
+Occorre inoltre che sia installata una libreria di python per il parsing delle date: `python-dateutil`, installabili dando il comando `pip install -r requirements.txt` se si é nella cartella del progetto.
 Il formato di log che questi server web usano è il formato _combined_, una possibile riproduzione di una visita potrebbe essere questa:
 
 `145.50.30.131 - [10/Mar/2015:13:55:36 -0100] "GET /second.html HTTP/1.1" 200 2326 "http://www.site.com/first.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"`
