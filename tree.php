@@ -20,6 +20,9 @@ The children of a first-level node are the pages that a user has visited coming 
 In this case the script is called "main.py", and the Javascript code is in "tree_graph.js"
 -->
 	<head>
+		<meta http-equiv="cache-control" content="no-cache"> 
+        <meta http-equiv="expires" content="0"> 
+        <meta http-equiv="pragma" content="no-cache">
 		<link href="css/header.css" rel="stylesheet" >
 	    <link href="https://mtgfiddle.me/tirocinio/pezze/css/bootstrap-datetimepicker.min.css" rel="stylesheet" > <!-- Datetime Picker plugin css (for calendar) -->
 	    <link href="https://mtgfiddle.me/tirocinio/pezze/css/bootstrap_.css" rel="stylesheet" > <!-- Bootstrap custom css -->

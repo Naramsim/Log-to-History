@@ -15,6 +15,9 @@
 Stack chart is a chart which shows among the time the different portions of users on all the folders of a site.
 -->
     <head>
+        <meta http-equiv="cache-control" content="no-cache"> 
+        <meta http-equiv="expires" content="0"> 
+        <meta http-equiv="pragma" content="no-cache">
         <link href="css/header.css" rel="stylesheet" >
         <link href="https://mtgfiddle.me/tirocinio/pezze/css/bootstrap-datetimepicker.min.css" rel="stylesheet" > <!-- Datetime Picker plugin css (for calendar) -->
         <link href="https://mtgfiddle.me/tirocinio/pezze/css/bootstrap_.css" rel="stylesheet" > <!-- Bootstrap custom css -->

@@ -20,6 +20,9 @@ For parsing the log PHP invokes a script made in Python that creates a file that
 In this case the script is called "main.py", and the Javascript code is in "flow_chart.js"
 -->
     <head>
+    	<meta http-equiv="cache-control" content="no-cache"> 
+        <meta http-equiv="expires" content="0"> 
+        <meta http-equiv="pragma" content="no-cache">
     	<link href="css/header.css" rel="stylesheet" >
 		<link href="https://mtgfiddle.me/tirocinio/pezze/css/bootstrap-datetimepicker.min.css" rel="stylesheet" > <!-- Datetime Picker plugin css (for calendar) -->
 		<link href="https://mtgfiddle.me/tirocinio/pezze/css/bootstrap_.css" rel="stylesheet" > <!-- Bootstrap custom css -->
@@ -37,7 +40,6 @@ In this case the script is called "main.py", and the Javascript code is in "flow
         <script src="https://mtgfiddle.me/tirocinio/pezze/chosen.jquery.min.js" type="text/javascript"></script><!-- Chosen Pluging (for button and search interaction)-->
         <script src="js/flow_chart.js" type="text/javascript"></script>
 
-        
     </head>
     <body>
     	<script>

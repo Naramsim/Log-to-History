@@ -148,14 +148,15 @@ def get_user_story():
                         json_list.append(json_dict)
                     else:
                         current_dict = search_in_list(req[0],json_list) #selects the dict of a specified IP #OPTIMIZE
-                        last_key = next(reversed(current_dict)) # gets last element(greater time)
-                        if my_site in req[5]: #if the referrer comes from our site
-                            referrer_folder = get_folder( re.sub('^'+protocol+my_site, '', req[5]) ) 
-                            if (current_dict[last_key] != referrer_folder) and (referrer_folder != folder_requested) and (not (+time_elapsed_since_first-2 < +last_key)): #if referrer is not equal to the last element
-                                if not any(black in referrer_folder for black in black_folders ): # and not in black list
-                                    mean = (+last_key + +time_elapsed_since_first)/2 
-                                    current_dict[mean] = referrer_folder # it adds the referrer folder 
-                        current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
+                        if current_dict:
+                            last_key = next(reversed(current_dict)) # gets last element(greater time)
+                            if my_site in req[5]: #if the referrer comes from our site
+                                referrer_folder = get_folder( re.sub('^'+protocol+my_site, '', req[5]) ) 
+                                if (current_dict[last_key] != referrer_folder) and (referrer_folder != folder_requested) and (not (+time_elapsed_since_first-2 < +last_key)): #if referrer is not equal to the last element
+                                    if not any(black in referrer_folder for black in black_folders ): # and not in black list
+                                        mean = (+last_key + +time_elapsed_since_first)/2 
+                                        current_dict[mean] = referrer_folder # it adds the referrer folder 
+                            current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
 
 
             # preparing JSON stack chart
