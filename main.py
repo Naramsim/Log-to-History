@@ -158,7 +158,6 @@ def get_user_story():
                                         current_dict[mean] = referrer_folder # it adds the referrer folder 
                             current_dict[time_elapsed_since_first] = folder_requested #add this visit to the others performed by the same IP
 
-
             # preparing JSON stack chart
             '''if folder_requested not in all_folders:
                 all_folders.append(folder_requested)
@@ -176,10 +175,10 @@ def get_user_story():
             else:
                 end_interval = end_interval + datetime.timedelta(seconds=scanning_interval)
                 #todo add the element'''
-
-                    
+    
         if not os.path.exists("data"):
             os.makedirs("data")
+            #os.chmod("data", 777)
 
         if to_render == 0:
             #CREATES JSON for Tree Graph
@@ -319,6 +318,7 @@ def get_requests():
                 compiled_line = compiled_line[0] # convert our [("","","")] to ("","","")
                 if ( any(x in compiled_line[2] for x in filters) or (compiled_line[2].endswith('/')) or (('.') not in compiled_line[2]) ):
                     request_time = apachetime(compiled_line[1])
+                    #request_time_ = time.strptime(compiled_line[1][:-6], '%d/%b/%Y:%H:%M:%S')
                     if ( not any(black in compiled_line[2] for black in black_folders ) ) and ( start_point <= request_time <= end_point ):
                         requests.append(compiled_line)
                     if request_time > end_point:

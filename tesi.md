@@ -246,7 +246,7 @@ def apachetime(s):
          int(s[12:14]), int(s[15:17]), int(s[18:20]))
 ```
 
-Sempre per ottimizzare main.py nella fase di scansione del log (la piú pesante e lenta), se la data di inizio log è distante da quella da dove parte l'analisi, la prima parte del log non viene presa in considerazione risparmiando molto tempo. Viene presa la data di inizio e fine log e la grandezza del file in bytes, conoscendo anche la data da cui l'utente vuole scansionare il log viene calcolata una percentuale che sta a significare quanta parte del file di log bisogna saltare. La formula è: `(data\_richesta - data\_inizio\_log / data\_fine\_log - data\_inizio\_log) * grandezza\_del\_file`
+Sempre per ottimizzare main.py nella fase di scansione del log (la piú pesante e lenta), se la data di inizio log è distante da quella da dove parte l'analisi, la prima parte del log non viene presa in considerazione risparmiando molto tempo. Viene presa la data di inizio e fine log e la grandezza del file in bytes, conoscendo anche la data da cui l'utente vuole scansionare il log viene calcolata una percentuale che sta a significare quanta parte del file di log bisogna saltare. La formula è: `(data_richesta - data_inizio_log / data_fine_log - data_inizio_log) * grandezza_del_file`
 
 ```python
 with open(log_dir, 'rb') as fh: #binary read
@@ -260,6 +260,12 @@ with open(log_dir, 'rb') as fh: #binary read
 ```
 
 Basta poi chiamare `access_log_file.seek(first_seek_jump, os.SEEK_SET)` e si sará evitato di analizzare la prima parte non necessaria del file di log. Qualora venga saltata una porzione troppo grande del file di log lo script torna indietro a passi fissi cercando una data minore rispetto a quella richiesta dall'utente.
+
+Grazie a queste ottimizzazioni si risparmia molto tempo nell'esecuzione lato server, come viene dimostrato nelle due immagini sotto, nella prima viene mostrato un profiling del programma attuale, nella seconda del programma senza l'uso di `seek()` e `apachetime()`. Il comando dato è lo stesso: `kernprof -l -v main.py 08/06/2015@08:00:30 08/06/2015@11:45:30 2` e dunque anche l'intervallo di scansione è lo stesso. Si può subito notare che il ciclo for esegue 50.000 cicli mentre nel secondo 200.000 dato che nel secondo non viene saltata alcuna parte di file. Si può vedere anche che per calcolare `request_time` nel primo caso occorrono 9.6 millisecondi a volta, mentre nel caso non ottimizzato ne servono 142.
+
+![Optimized](http://i.imgur.com/XXmDcYZ.png "Optimized")
+
+![Not Optimized](http://i.imgur.com/cEVrKd3.png "Not Optimized")
 
 Per analizzare gli script lato browser invece è stata usata la console di Google Chrome nella sezione di profiling, essa mostra il tempo speso per ogni funzione. Nel nostro caso vi era un grosso ammontare di tempo speso nella funzione `findClosest()`. Il suo ruolo era, in un dizionario, oggetto non ordinato in JavaScript, restituire l'elemento dopo uno selezionato.
 
