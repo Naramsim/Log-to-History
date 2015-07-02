@@ -333,15 +333,16 @@ Di seguito vengono riportate alcune statistiche sui tempi di analisi e di render
 Lato server esso è in grado di analizzare interamente un access log da 100mb in circa 30 secondi su una macchina VPS con una CPU Intel(R) Xeon(R) CPU E5-2630L (2.3GHz) e 50mb di RAM disponibile, non arrivando mai a consumare tutti i 50mb di RAM. 
 
 ![Starting RAM](http://i.imgur.com/0qongbO.png "Starting RAM") ![RAM before exiting](http://i.imgur.com/NrfBfzX.png "RAM before exiting")
+
 Per analizzare solo un'ora posta nel mezzo del file di log lo script impiega meno di un secondo, per analizzare le ultime 24 ore del file di log impiega dodici secondi.
 
 Lato client per il rendering di un grafico tree di durata un'ora Javascript per eseguire tutto il suo lavoro impiega 0.6 secondi.
 
-![Tree rendering](http://i.imgur.com/MK128Mz.png "Tree rendering")
+![Tree rendering](http://i.imgur.com/X9Nu3o1.png "Tree rendering")
 
 Per visualizzare un grafico flow di un'ora, Javascript lavora 2.7 secondi.
 
-![Flow rendering](http://i.imgur.com/JEaGsgx.png "Flow rendering")
+![Flow rendering](http://i.imgur.com/XnsXLYf.png "Flow rendering")
 
 Mentre per mettere a grafico tre giorni su stack, Javascript impiega 1.9 secondi, notando che il browser resta in attesa(fase idle) per molto tempo che il server finisca di elaborare l'intero log.
 
@@ -350,5 +351,5 @@ Mentre per mettere a grafico tre giorni su stack, Javascript impiega 1.9 secondi
 
 ## Conclusioni
 
-Log to History è senza dubbio un buon software con i suoi pregi e le sue lacune. Per prima cosa esso si pone in contrasto con gli altri analizzatori di server web prediligendo la vista microscopica a quella macroscopica. Esso introduce una nuova tecnica di analisi a cartelle che nessun analizzatore aveva fino ad ora, molto utile per generalizzare le visite. Propone tre grafici con diversi livelli di generalizzazione: il primo è tree che non generalizza nulla, per ogni utente egli mostra esattamente tutte le pagine, senza ridurle a cartelle, che ha visitato. Il secondo grafico è flow nel quale si può vedere la cronologia di tutti gli utenti al livello di cartella contemporaneamente, quindi già con questo grafico si generalizzano levisite dell'utente a cartelle e non più a pagine. L'ultimo grafico è il più generico di tutti, esso tralascia completamente l'utente e si avvicina come standard agli altri analizzatori che si possono trovare online. Esso mostra l'andamento del numero di utenti che navigano una certa cartella durante un certo lasso di tempo.
-Log to History ha ancora molti aspetti in cui migliorare, ma considerando che è stato sviluppato in 3 mesi si può dire che ha già raggiunto un buon livello di complessità. 
+Log to History è senza dubbio un buon software con i suoi pregi e le sue lacune. Per prima cosa esso si pone in contrasto con gli altri analizzatori di server web prediligendo la vista microscopica a quella macroscopica. Esso introduce una nuova tecnica di analisi a cartelle che nessun analizzatore aveva fino ad ora, molto utile per generalizzare le visite. Propone in tutto tre grafici con diversi livelli di generalizzazione: il primo è tree che non generalizza nulla, per ogni utente mostra esattamente tutte le pagine, senza ridurle a cartelle, che ha visitato. Il secondo grafico è flow nel quale si può vedere la cronologia di tutti gli utenti contemporaneamente a livello di cartella , quindi già con questo grafico si generalizzano le visite dell'utente a cartelle e non più a pagine. L'ultimo grafico è il più generico di tutti, esso tralascia completamente l'utente e si avvicina come standard agli altri analizzatori che si possono trovare online. Esso mostra l'andamento del numero di utenti che navigano una certa cartella durante un certo lasso di tempo.
+Log to History ha ancora molti aspetti in cui migliorare, ma considerando che è stato sviluppato in 3 mesi si può dire che ha già raggiunto un buon livello di complessità e praticità.
