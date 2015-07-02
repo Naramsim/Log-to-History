@@ -335,6 +335,18 @@ Lato server esso è in grado di analizzare interamente un access log da 100mb in
 ![Starting RAM](http://i.imgur.com/0qongbO.png "Starting RAM") ![RAM before exiting](http://i.imgur.com/NrfBfzX.png "RAM before exiting")
 Per analizzare solo un'ora posta nel mezzo del file di log lo script impiega meno di un secondo, per analizzare le ultime 24 ore del file di log impiega dodici secondi.
 
+Lato client per il rendering di un grafico tree di durata un'ora Javascript per eseguire tutto il suo lavoro impiega 0.6 secondi.
+
+![Tree rendering](http://i.imgur.com/MK128Mz.png "Tree rendering")
+
+Per visualizzare un grafico flow di un'ora, Javascript lavora 2.7 secondi.
+
+![Flow rendering](http://i.imgur.com/JEaGsgx.png "Flow rendering")
+
+Mentre per mettere a grafico tre giorni su stack, Javascript impiega 1.9 secondi, notando che il browser resta in attesa(fase idle) per molto tempo che il server finisca di elaborare l'intero log.
+
+![Stack rendering](http://i.imgur.com/Yuv4gii.png "Stack rendering")
+
 
 ## Conclusioni
 
