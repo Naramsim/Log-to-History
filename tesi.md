@@ -331,6 +331,7 @@ location ~ \config.json {
 Di seguito vengono riportate alcune statistiche sui tempi di analisi e di rendering di Log to History.
 
 Lato server esso è in grado di analizzare interamente un access log da 100mb in circa 30 secondi su una macchina VPS con una CPU Intel(R) Xeon(R) CPU E5-2630L (2.3GHz) e 50mb di RAM disponibile, non arrivando mai a consumare tutti i 50mb di RAM. 
+
 ![Starting RAM](http://i.imgur.com/0qongbO.png "Starting RAM") ![RAM before exiting](http://i.imgur.com/NrfBfzX.png "RAM before exiting")
 Per analizzare solo un'ora posta nel mezzo del file di log lo script impiega meno di un secondo, per analizzare le ultime 24 ore del file di log impiega dodici secondi.
 
