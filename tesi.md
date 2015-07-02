@@ -344,7 +344,7 @@ Per visualizzare un grafico flow di un'ora, Javascript lavora 2.7 secondi.
 
 ![Flow rendering](http://i.imgur.com/XnsXLYf.png "Flow rendering")
 
-Mentre per mettere a grafico tre giorni su stack, Javascript impiega 1.9 secondi, notando che il browser resta in attesa(fase idle) per molto tempo che il server finisca di elaborare l'intero log.
+Mentre per mettere a grafico tre giorni su stack, Javascript impiega 1.9 secondi, notando che il browser resta inattivo(fase idle) per molto tempo aspettando che il server finisca di elaborare l'intero log.
 
 ![Stack rendering](http://i.imgur.com/Yuv4gii.png "Stack rendering")
 
