@@ -261,7 +261,7 @@ with open(log_dir, 'rb') as fh: #binary read
 
 Basta poi chiamare `access_log_file.seek(first_seek_jump, os.SEEK_SET)` e si sará evitato di analizzare la prima parte non necessaria del file di log. Qualora venga saltata una porzione troppo grande del file di log lo script torna indietro a passi fissi cercando una data minore rispetto a quella richiesta dall'utente.
 
-Grazie a queste ottimizzazioni si risparmia molto tempo nell'esecuzione lato server, come viene dimostrato nelle due immagini sotto, nella prima viene mostrato un profiling del programma attuale, nella seconda del programma senza l'uso di `seek()` e `apachetime()`. Il comando dato è lo stesso: `kernprof -l -v main.py 08/06/2015@08:00:30 08/06/2015@11:45:30 2` e dunque anche l'intervallo di scansione è lo stesso. Si può subito notare che il ciclo for esegue 50.000 cicli mentre nel secondo 200.000 dato che nel secondo non viene saltata alcuna parte di file. Si può vedere anche che per calcolare `request_time` nel primo caso occorrono 9.6 millisecondi a volta, mentre nel caso non ottimizzato ne servono 142.
+Grazie a queste ottimizzazioni si risparmia molto tempo nell'esecuzione lato server, come viene dimostrato nelle due immagini sotto, nella prima viene mostrato un profiling del programma attuale, nella seconda del programma senza l'uso di `seek()` e `apachetime()`. Il comando dato è lo stesso: `kernprof -l -v main.py 08/06/2015@08:00:30 08/06/2015@11:45:30 2` e dunque anche l'intervallo di scansione è lo stesso. Si può subito notare che il ciclo for esegue 50.000 cicli nel primo caso mentre nel secondo 200.000 dato che nel secondo non viene saltata alcuna parte di file. Si può vedere anche che per calcolare `request_time` nel primo caso occorrono 9.6 millisecondi a volta, mentre nel caso non ottimizzato ne servono 142.
 
 ![Optimized](http://i.imgur.com/XXmDcYZ.png "Optimized")
 
@@ -326,3 +326,16 @@ location ~ \config.json {
     deny all;
 }
 ```
+
+## Statistiche
+Di seguito vengono riportate alcune statistiche sui tempi di analisi e di rendering di Log to History.
+
+Lato server esso è in grado di analizzare interamente un access log da 100mb in circa 30 secondi su una macchina VPS con una CPU Intel(R) Xeon(R) CPU E5-2630L (2.3GHz) e 50mb di RAM disponibile, non arrivando mai a consumare tutti i 50mb di RAM. 
+![Starting RAM](http://i.imgur.com/0qongbO.png "Starting RAM") ![RAM before exiting](http://i.imgur.com/NrfBfzX.png "RAM before exiting")
+Per analizzare solo un'ora posta nel mezzo del file di log lo script impiega meno di un secondo, per analizzare le ultime 24 ore del file di log impiega dodici secondi.
+
+
+## Conclusioni
+
+Log to History è senza dubbio un buon software con i suoi pregi e le sue lacune. Per prima cosa esso si pone in contrasto con gli altri analizzatori di server web prediligendo la vista microscopica a quella macroscopica. Esso introduce una nuova tecnica di analisi a cartelle che nessun analizzatore aveva fino ad ora, molto utile per generalizzare le visite. Propone tre grafici con diversi livelli di generalizzazione: il primo è tree che non generalizza nulla, per ogni utente egli mostra esattamente tutte le pagine, senza ridurle a cartelle, che ha visitato. Il secondo grafico è flow nel quale si può vedere la cronologia di tutti gli utenti al livello di cartella contemporaneamente, quindi già con questo grafico si generalizzano levisite dell'utente a cartelle e non più a pagine. L'ultimo grafico è il più generico di tutti, esso tralascia completamente l'utente e si avvicina come standard agli altri analizzatori che si possono trovare online. Esso mostra l'andamento del numero di utenti che navigano una certa cartella durante un certo lasso di tempo.
+Log to History ha ancora molti aspetti in cui migliorare, ma considerando che è stato sviluppato in 3 mesi si può dire che ha già raggiunto un buon livello di complessità. 
