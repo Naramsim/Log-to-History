@@ -1,5 +1,5 @@
 # Log to History
-Uno strumento di analisi rivolto al web.
+Uno strumento di analisi rivolto al web. 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -25,17 +25,21 @@ Indice:
     - [stack_chart.js](#stack_chartjs)
     - [Interfaccia grafica](#interfaccia-grafica)
 - [Ottimizzazioni](#ottimizzazioni)
-- [Problemi](#problemi)
+- [Troubleshooting](#troubleshooting)
   - [Generare un access.log su server web alternativi](#generare-un-accesslog-su-server-web-alternativi)
   - [Installare la libreria python-dateutil](#installare-la-libreria-python-dateutil)
   - [Nascondere config.json al pubblico](#nascondere-configjson-al-pubblico)
+- [Statistiche](#statistiche)
+- [Conclusioni](#conclusioni)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Introduzione
 
-Log to history è uno strumento che permette di analizzare le visite di un determinato sito.
-Esso è composto da tre grafici che vengono costruiti andando ad analizzare un file, noto come access log, che registra tutte le visite da parte di utenti su un determinato sito web. Di questi grafici i primi due tendono a dare una vista microscopica, ovvero sono più efficaci per analizzare brevi periodi di tempo, mentre l'ultimo grafico è adattabile ad un qualsiasi periodo, sia di poche ore sia di più giorni. L'idea per la creazione di Log to History è venuta perchè sul web mancano degli strumenti di analisi microscopica e di analisi del flusso di utenti. Nella prima fase del progetto sono stati infatti analizzati altri software open source, di seguito viene presentata una lista dei più diffusi con i relativi punti di forza e lacune.
+Log to history è uno strumento che permette di analizzare le visite di un determinato sito. È stato scritto con l'aiuto di Norbert Paissan durante un periodo di tesi/tirocinio di 3 mesi.
+È un software installabile su tutti i server web ed è scritto con i linguaggi Python, PHP e Javascript, il suo codice è open source e si può estendere o consultare al seguente [link](https://github.com/Naramsim/Log-to-History). 
+Esso è composto da tre grafici che vengono costruiti andando ad analizzare un file, noto come access log, che registra tutte le visite da parte di utenti su un determinato sito web. Di questi grafici i primi due tendono a dare una vista microscopica, ovvero sono più efficaci per analizzare brevi periodi di tempo, mentre l'ultimo grafico è adattabile ad un qualsiasi periodo, sia di poche ore sia di più giorni. L'idea per la creazione di Log to History è venuta perché sul web mancano strumenti di analisi microscopica e di analisi del flusso di utenti. Lo scopo di Log to History, infatti, è riuscire ad analizzare come un utente naviga su un sito, ricostruendo la sua cronologia.
+Nella prima fase del progetto sono stati analizzati altri software open source che analizzano le visite a siti web, di seguito viene presentata una lista dei più diffusi con i relativi punti di forza e lacune.
 
 ### Altri analizzatori open source
 
@@ -65,7 +69,7 @@ Flow è un diagramma di flusso che sviluppa verticalmente, il suo scopo è quell
 
 ![Flow Graph](http://i.imgur.com/US2Slyk.png "Flow Graph")
 
-In questo esempio si possono notare i visitatori di un sito del giorno 8 Giugno dalle 19.07 alle 19.10, è evidenziato un visitatore che è stato cercato tramite la search-box in alto a sinistra. Il visitatore è identificato dal suo indirizzo IP e la sua cronologia di un colore arancio. Si puó capire che il visitatore ha abbandonato una pagina un _/confronto_ verso le 19.50 per andare su una pagina in _/atleta_, poi è ritornato su _/confronto_ e in fine è ritornato in _/atleta_.
+In questo esempio si possono notare i visitatori di un sito del giorno 8 Giugno dalle 19.07 alle 19.10, è evidenziato un visitatore che è stato cercato tramite la search-box in alto a sinistra. Il visitatore è identificato dal suo indirizzo IP e la sua cronologia di un colore arancio. Si può capire che il visitatore ha abbandonato una pagina un _/confronto_ verso le 19.50 per andare su una pagina in _/atleta_, poi è ritornato su _/confronto_ e in fine è ritornato in _/atleta_.
 
 #### Nota su tree e flow
 Questi due grafici sono utili per avere una vista microscopica di un determinato periodo di tempo, che può andare dal minuto al massimo di un'ora. La logica di un intervallo così breve sta nel capire che se si analizzasse un periodo più lungo i grafici sarebbero troppo lunghi e non si capirebbe più molto il rendering. Vi è da dire anche che ad ogni riconnessione ad internet un utente può cambiare indirizzo IP, il che significa che è quasi impossibile rintracciare la storia di un utente in periodi lunghi. In stack invece l'utente non è più considerato e dunque l'analisi si può prolungare a qualsiasi periodo.
@@ -75,11 +79,11 @@ Stack è un grafico che si concentra sulle visite non tenendo conto di chi ha fa
 
 ![Stack Chart](http://i.imgur.com/672XWzU.png "Stack Chart")
 
-Sopra viene mostrato un esempio prolungato di uno stack chart, dalle tre di mattina fino alle venti di sera, si puó notare come in generale gli utenti tendano a crescere durante la mattinata per poi stabilizzarsi. Vi sono anche alcuni picchi che sono dovuti ad attivitá di indicizzazione di spider e crawler. Si puó notare anche che le pagine piú richieste sono quelle che risiedono nella cartella _/atleta_.
+Sopra viene mostrato un esempio prolungato di uno stack chart, dalle tre di mattina fino alle venti di sera, si può notare come in generale gli utenti tendano a crescere durante la mattinata per poi stabilizzarsi. Vi sono anche alcuni picchi che sono dovuti ad attivitá di indicizzazione di spider e crawler. Si può notare anche che le pagine più richieste sono quelle che risiedono nella cartella _/atleta_.
 
 ![Stack Chart](http://i.imgur.com/IEy1Iti.png "Stack Chart")
 
-In questo esempio viene analizzato invece solo un breve periodo di un'ora, e viene usato il metodo _Expanded_ che mostra la percentuale di utenti per ogni cartella del sito. Si puó vedere che nella prima mezz'ora gli utenti sono prevalentemente su _/atleta_, mentre nella seconda mezz'ora tendono a crescere le visite su _/confronto_ e sulla root del sito (_/_), ovvero la home-page.
+In questo esempio viene analizzato invece solo un breve periodo di un'ora, e viene usato il metodo _Expanded_ che mostra la percentuale di utenti per ogni cartella del sito. Si può vedere che nella prima mezz'ora gli utenti sono prevalentemente su _/atleta_, mentre nella seconda mezz'ora tendono a crescere le visite su _/confronto_ e sulla root del sito (_/_), ovvero la home-page.
 
 ## Sviluppo
 
@@ -87,13 +91,13 @@ In questo esempio viene analizzato invece solo un breve periodo di un'ora, e vie
 Come fase iniziale prima ancora di precisare il nostro obiettivo abbiamo studiato e installato molti [analizzatori](#altri-analizzatori-open-source) di access log open source che si trovano in rete, li abbiamo confrontati e siamo giunti alla conclusione che l'unica cosa che mancava era uno strumento di analisi microscopica che tenesse conto dell'utente, che mostrasse come si muove all'interno di un sito. Da qui è nata l'idea per lo sviluppo di Log to History. Dopo aver scoperto il nostro obiettivo abbiamo cominciato a studiare il metodo migliore per realizzarlo, quali linguaggi usare, come visualizzare i dati, come interfacciarsi con l'utente. Siamo quindi arrivati ad utilizzare Python lato Server, per la sua semplicità e velocità. PHP  è stato usato come intermediario con il browser dell'utente, si sarebbe potuto riutilizzare Python come web-server attraverso dei framework (esempio: Django, Flask, Tornado) ma secondo [alcune statistiche](http://news.netcraft.com/archives/2015/05/19/may-2015-web-server-survey.html) la maggior parte degli utenti usa ancora la soluzione Apache/PHP come server web. Infine è stata usata la libreria basata su Javascript [D3](https://github.com/mbostock/d3) per il rendering dei dati su browser, grazie al fatto che essa crea grafici non statici direttamente nel browser dell'utente, diversamente da altre librerie che si limitano a fornire solo immagini di grafici.
 
 ### Fase di sviluppo
-Durante la fase di sviluppo abbiamo usato come editor di codice [Sublime 3](https://www.sublimetext.com/3), come strumento di controllo versione Git assieme a Github, sul quale si trova tutto il [codice sorgente](https://github.com/Naramsim/Log-to-History/). Per testare il prodotto si è usato un [server](https://mtgfiddle.me/tirocinio/pezze/) su DigitalOcean con 1gb di Ram e un solo processore, nonostante queste sue caratteristiche a dir poco non eccezionali Log to History funziona bene e velocemente. Come access log ci sono stati forniti più file di log di un sito molto visitato: [Atletica.me](http://atletica.me/), realizzato da due studenti frequentanti il mio stesso corso di Informatica. Questo sito permette di navigare fra tutti gli atleti d'Italia, confrontarne i risultati, seguire le gare a cui si sono iscritti e ricevere notifiche dei propri atleti preferiti.
+Durante la fase di sviluppo abbiamo usato come editor di codice [Sublime 3](https://www.sublimetext.com/3), come strumento di controllo versione Git assieme a Github, sul quale si trova tutto il [codice sorgente](https://github.com/Naramsim/Log-to-History/). Per testare il prodotto si è usato un [server](https://mtgfiddle.me/tirocinio/pezze/) su DigitalOcean con 512mb di Ram e un solo processore, nonostante queste sue caratteristiche a dir poco non eccezionali Log to History funziona bene e velocemente. Come access log ci sono stati forniti più file di log di un sito molto visitato: [Atletica.me](http://atletica.me/), realizzato da due studenti frequentanti il mio stesso corso di Informatica. Questo sito permette di navigare fra tutti gli atleti d'Italia, confrontarne i risultati, seguire le gare a cui si sono iscritti e ricevere notifiche dei propri atleti preferiti. Per scrivere questo elaborato è stato usato il linguaggio [Markdown](http://daringfireball.net/projects/markdown/) che permette di scrivere in plain-text e successivamente di essere trasformato in un file HTML o in versione PDF attraverso il sito [GitPrint](https://gitprint.com/).
 
 ### Fase di testing
-Dopo ogni aggiunta significativa al codice è avvenuta una fase di testing, fase che si è prolungata quando il programma è stato ultimato, dalla fase di testing si è poi passati ad [ottimizzare](#ottimizzazioni) il codice.
+Dopo ogni aggiunta significativa al codice è avvenuta una fase di testing, fase che si è prolungata quando il programma è stato ultimato, dalla fase di testing si è poi passati ad [ottimizzare](#ottimizzazioni) il codice. La fase di testing ha previsto un confronto dei risultati di Log to History con i dati che venivano effettivamente forniti dall'access log. Si è testata inoltre l'installazione del software su altri server oltre che a quello di sviluppo.
 
 ## Funzionamento
-I grafici proposti all'utente sono creati _online_, ovvero quando l'utente li richiede, così da circonscrivere solo il periodo che l'utente vuole analizzare.
+I grafici proposti all'utente sono creati _online_, ovvero quando l'utente li richiede, così da circoscrivere solo il periodo che l'utente vuole analizzare.
 Il lavoro è spartito fra server (il sito) e client (l'utente), il server analizza il file di accesso al sito (access.log), seleziona il periodo richiesto dall'utente e prepara per il client un file di piccole dimensioni in formato JSON, così da rendere il download veloce, che sarà ri-analizzato e renderizzato dal browser. 
 Il lavoro del server è fatto da due programmi, Python e PHP. Python analizza il file di log e crea il file per il client, mentre PHP fa da ponte tra server e client. Il client invece necessita solo di un browser.
 
@@ -117,14 +121,14 @@ Nell'esempio sopra il referrer della seconda visita combacia perfettamente con l
 145.50.30.131 - [10/Mar/2015:13:55:56 -0100] "GET /second.html HTTP/1.1" 200 2136 "http://www.mysite.com/about.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"
 ```
 
-In questo esempio invece il referrer (_/about.html_) è diverso dalla vista precedente (_/first.html_), questo vuol dire che l'utente inizialmente era su _/first.html_, poi è passato a visitare _/second.html_ non venendo da _/first.html_ ma da _/about.html_, il che significa che egli in precedenza aveva aperto la pagina _/about.html_ (magari in un altra tab del browser) e poi da li ha cliccato un link che lo ha portato a _/second.html_.
+In questo esempio invece il referrer (_/about.html_) è diverso dalla vista precedente (_/first.html_), questo vuol dire che l'utente inizialmente era su _/first.html_, poi è passato a visitare _/second.html_ non venendo da _/first.html_ ma da _/about.html_, il che significa che egli in precedenza aveva aperto la pagina _/about.html_ (magari in un'altra tab del browser) e poi da li ha cliccato un link che lo ha portato a _/second.html_.
 L'ordine che l'utente ha seguito è dunque: _/first.html_ -> _/about.html_ -> _/second.html_
 
 Viene così ricreata esattamente la sua visita temporale al sito, compresa di salti fra le tab del browser. 
 Diversamente viene fatto per il grafico tree che mostra la cronologia degli utenti a livello di spostamenti tramite link. Questo significa per ogni utente vi possono essere più cronologie
 
 #### Il ruolo di PHP
-Il primo programma ad essere interpellato sul server è PHP tramite una richiesta AJAX da parte del browser che porta la data di inizio e di fine scansione del log richiesta dall'utente e una stringa indicante il nome del file JSON da creare. PHP tramite il comando `ob_start()` e `system()` chiama uno script Python (main.py) con quattro parametri, le due date e il tipo di grafico richiesto dall'utente e il nome da dare al file JSON. Una volta eseguito lo script, PHP invia al browser una stringa vuota se main.py ha avuto successo, una stringa "fail", se c'è stato un errore e non si possono visualizzare i dati. Durante la chiamata `system()` viene eseguito main.py, script fondamentale. Dopo l'avvio dello script si riceve l'output di main.py, o vuoto o "fail", con la chiamata `ob_get_clean()`. Lo stesso output verrà riportato al browser dell'utente che deciderà se scaricare il file JSON e renderizzarlo o lanciare un errore. Sorge ora una domanda fondamentale, perchè usare due chiamate AJAX per avviare lo script e per poi scaricare il JSON invece che usarne solo una e farsi restituire subito il JSON? Perchè con la prima chiamata AJAX si comunica a PHP di eseguire main.py tramite `system()`, da questa chiamata `ob_get_clean()` preleva il buffer che è stato prodotto, nel buffer si potrebbe dunque scrivere il JSON, ma se lo script non andasse a buon fine nel buffer verrebbero scritti gli errori del traceback che poi verrebbero restituiti all'utente che potrebbe leggere tutto ed eseguire operazioni malevoli. Dunque per un fatto di sicurezza non viene mai mostrato l'output di python e si chiede all'utente di scaricare un nuovo file JSON creato appunto da python.
+Il primo programma ad essere interpellato sul server è PHP tramite una richiesta AJAX da parte del browser che porta la data di inizio e di fine scansione del log richiesta dall'utente e una stringa indicante il nome del file JSON da creare. PHP tramite il comando `ob_start()` e `system()` chiama uno script Python (main.py) con quattro parametri, le due date e il tipo di grafico richiesto dall'utente e il nome da dare al file JSON. Una volta eseguito lo script, PHP invia al browser una stringa vuota se main.py ha avuto successo, una stringa "fail", se c'è stato un errore e non si possono visualizzare i dati. Durante la chiamata `system()` viene eseguito main.py, script fondamentale. Dopo l'avvio dello script si riceve l'output di main.py, o vuoto o "fail", con la chiamata `ob_get_clean()`. Lo stesso output verrà riportato al browser dell'utente che deciderà se scaricare il file JSON e renderizzarlo o lanciare un errore. Sorge ora una domanda fondamentale, perché usare due chiamate AJAX per avviare lo script e per poi scaricare il JSON invece che usarne solo una e farsi restituire subito il JSON? Perchè con la prima chiamata AJAX si comunica a PHP di eseguire main.py tramite `system()`, da questa chiamata `ob_get_clean()` preleva il buffer che è stato prodotto, nel buffer si potrebbe dunque scrivere il JSON, ma se lo script non andasse a buon fine nel buffer verrebbero scritti gli errori del traceback che poi verrebbero restituiti all'utente che potrebbe leggere tutto ed eseguire operazioni malevoli. Dunque per un fatto di sicurezza non viene mai mostrato l'output di python e si chiede all'utente di scaricare un nuovo file JSON creato appunto da python.
 
 #### main.py
 main.py è lo script che sta alla base di tutti e tre i grafici, è capace di costruire i dati per tutti e tre. Come parametri prende due date, un numero che identifica il tipo di grafico che l'utente ha richiesto: 0-> tree, 1-> flow, 2->stack e una stringa casuale che indica il nome del file da creare.
@@ -137,7 +141,7 @@ Come prima cosa apre il file config.json, in cui ci sono dei parametri impostati
 * whitelist\_extensions: qui vengono definiti i file che si vogliono analizzare, tipicamente si scelgono i file .html, .php, tralasciando le immagini, i fogli di stile e gli script
 * omit\_malicious\_bots: se _true_ lo script non esaminerà i tentativi di falsi login a pagine inesistenti del sito
 
-Come seconda cosa lo script esegue `get_requests()` e apre il file di log, lo legge riga per riga per non occupare RAM preziosa e decide se la riga deve essere tenuta o scartata, perchè fuori range, controllando se la data è nell'intervallo richiesto, perchè appartiene alla blacklist o non appartiene alla whitelist.
+Come seconda cosa lo script esegue `get_requests()` e apre il file di log, lo legge riga per riga per non occupare RAM preziosa e decide se la riga deve essere tenuta o scartata, perché fuori range, controllando se la data è nell'intervallo richiesto, perché appartiene alla blacklist o non appartiene alla whitelist.
 Viene poi eseguito anche un controllo per evitare di passare al browser un file troppo lungo: se viene richiesto flow o tree e il numero di accessi è troppo alto per essere renderizzato da un browser viene lanciato un errore e il programma si ferma. 
 Dopo la fase di preparazione avviene la vera e propria costruzione del file da passare al browser, un file JSON. Per stack e flow questo file è molto simile, mentre per tree è totalmente diverso.
 Il JSON che viene sviluppato per tree è di questa forma:
@@ -212,7 +216,7 @@ Questo script crea un albero orizzontale, il primo livello di nodi identifica l'
 
 #### flow_chart.js
 
-Anche `flow_chart.js` scarica subito il JSON contenente i dati riguardo alle visite. Avviene una fase di analisi e poi di rendering. Il rendering viene affidato a una funzione, `draw()`, che è da considerarsi una sorta black box, in quanto non è stata scritta da me ma presa da un'infografica del New York Times che mostra come le varie squadre di football abbiano cambiato campionato nel corso degli anni: [Football Conferences](http://www.nytimes.com/newsgraphics/2013/11/30/football-conferences/). Questo script quindi prepara i dati per la funzione e poi la chiama. Quello che viene essenzialmente fatto dalla fase di pre-processing è aggiungere delle entry al file JSON, perchè il codice preso è basato per analizzare anni, mentre Log to History deve analizzare misure molto più brevi, come minuti e secondi. Ciò che è invece fatto da `draw()` è disegnare delle linee verticali, rappresentanti i visitatori che stanno navigando su un pagina del sito, e delle linee di shift che stanno a significare che il visitatore ha cambiato pagina.
+Anche `flow_chart.js` scarica subito il JSON contenente i dati riguardo alle visite. Avviene una fase di analisi e poi di rendering. Il rendering viene affidato a una funzione, `draw()`, che è da considerarsi una sorta black box, in quanto non è stata scritta da me ma presa da un'infografica del New York Times che mostra come le varie squadre di football abbiano cambiato campionato nel corso degli anni: [Football Conferences](http://www.nytimes.com/newsgraphics/2013/11/30/football-conferences/). Questo script quindi prepara i dati per la funzione e poi la chiama. Quello che viene essenzialmente fatto dalla fase di pre-processing è aggiungere delle entry al file JSON, perché il codice preso è basato per analizzare anni, mentre Log to History deve analizzare misure molto più brevi, come minuti e secondi. Ciò che è invece fatto da `draw()` è disegnare delle linee verticali, rappresentanti i visitatori che stanno navigando su un pagina del sito, e delle linee di shift che stanno a significare che il visitatore ha cambiato pagina.
 
 #### stack_chart.js
 
@@ -246,7 +250,7 @@ def apachetime(s):
          int(s[12:14]), int(s[15:17]), int(s[18:20]))
 ```
 
-Sempre per ottimizzare main.py nella fase di scansione del log (la piú pesante e lenta), se la data di inizio log è distante da quella da dove parte l'analisi, la prima parte del log non viene presa in considerazione risparmiando molto tempo. Viene presa la data di inizio e fine log e la grandezza del file in bytes, conoscendo anche la data da cui l'utente vuole scansionare il log viene calcolata una percentuale che sta a significare quanta parte del file di log bisogna saltare. La formula è: `(data_richesta - data_inizio_log / data_fine_log - data_inizio_log) * grandezza_del_file`
+Sempre per ottimizzare main.py nella fase di scansione del log (la più pesante e lenta), se la data di inizio log è distante da quella da dove parte l'analisi, la prima parte del log non viene presa in considerazione risparmiando molto tempo. Viene presa la data di inizio e fine log e la grandezza del file in bytes, conoscendo anche la data da cui l'utente vuole scansionare il log viene calcolata una percentuale che sta a significare quanta parte del file di log bisogna saltare. La formula è: `(data_richesta - data_inizio_log / data_fine_log - data_inizio_log) * grandezza_del_file`
 
 ```python
 with open(log_dir, 'rb') as fh: #binary read
@@ -259,7 +263,7 @@ with open(log_dir, 'rb') as fh: #binary read
     first_seek_jump = int((start_percentage - 0.05) * log_size)
 ```
 
-Basta poi chiamare `access_log_file.seek(first_seek_jump, os.SEEK_SET)` e si sará evitato di analizzare la prima parte non necessaria del file di log. Qualora venga saltata una porzione troppo grande del file di log lo script torna indietro a passi fissi cercando una data minore rispetto a quella richiesta dall'utente.
+Basta poi chiamare `access_log_file.seek(first_seek_jump, os.SEEK_SET)` e si sarà evitato di analizzare la prima parte non necessaria del file di log. Qualora venga saltata una porzione troppo grande del file di log lo script torna indietro a passi fissi cercando una data minore rispetto a quella richiesta dall'utente.
 
 Grazie a queste ottimizzazioni si risparmia molto tempo nell'esecuzione lato server, come viene dimostrato nelle due immagini sotto, nella prima viene mostrato un profiling del programma attuale, nella seconda del programma senza l'uso di `seek()` e `apachetime()`. Il comando dato è lo stesso: `kernprof -l -v main.py 08/06/2015@08:00:30 08/06/2015@11:45:30 2` e dunque anche l'intervallo di scansione è lo stesso. Si può subito notare che il ciclo for esegue 50.000 cicli nel primo caso mentre nel secondo 200.000 dato che nel secondo non viene saltata alcuna parte di file. Si può vedere anche che per calcolare `request_time` nel primo caso occorrono 9.6 millisecondi a volta, mentre nel caso non ottimizzato ne servono 142.
 
@@ -284,7 +288,7 @@ function findClosest(associative_array, id, increasing) {
     }
 ```
 
-Questo metodo è altamente inefficiente perchè per cercare l'elemento si procede a passi piccoli (+1, -1) controllando se appunto esiste un elemento, il metodo è stato sostituito da un array in cui ad ogni elemento dell'array è associato un indice: 
+Questo metodo è altamente inefficiente perché per cercare l'elemento si procede a passi piccoli (+1, -1) controllando se appunto esiste un elemento, il metodo è stato sostituito da un array in cui ad ogni elemento dell'array è associato un indice: 
 
 ```javascript
 var array_sorted_keys = Object.keys(associative_array).sort( function(a,b) { //sorting object elements for fast access to the next element
@@ -330,13 +334,13 @@ location ~ \config.json {
 ## Statistiche
 Di seguito vengono riportate alcune statistiche sui tempi di analisi e di rendering di Log to History.
 
-Lato server esso è in grado di analizzare interamente un access log da 100mb in circa 30 secondi su una macchina VPS con una CPU Intel(R) Xeon(R) CPU E5-2630L (2.3GHz) e 50mb di RAM disponibile, non arrivando mai a consumare tutti i 50mb di RAM. 
+Lato server esso è in grado di analizzare interamente un access log da 100mb in circa 30 secondi su una macchina VPS Debian con una CPU Intel(R) Xeon(R) CPU E5-2630L (2.3GHz) e 50mb di RAM disponibile, non arrivando mai a consumare tutti i 50mb di RAM. Per questa analisi è stato usato il comando `watch cat /proc/meminfo` che da molte statistiche sul uso della RAM nei sistemi Linux.
 
 ![Starting RAM](http://i.imgur.com/0qongbO.png "Starting RAM") ![RAM before exiting](http://i.imgur.com/NrfBfzX.png "RAM before exiting")
 
 Per analizzare solo un'ora posta nel mezzo del file di log lo script impiega meno di un secondo, per analizzare le ultime 24 ore del file di log impiega dodici secondi.
 
-Lato client per il rendering di un grafico tree di durata un'ora Javascript per eseguire tutto il suo lavoro impiega 0.6 secondi.
+Lato client per il rendering di un grafico tree di durata un'ora Javascript esegue tutto il suo lavoro impiegando 0.6 secondi. Per ricavare questi numeri è stata usata la console di Google Chrome nella sezione "timeline".
 
 ![Tree rendering](http://i.imgur.com/X9Nu3o1.png "Tree rendering")
 
@@ -351,5 +355,5 @@ Mentre per mettere a grafico tre giorni su stack, Javascript impiega 1.9 secondi
 
 ## Conclusioni
 
-Log to History è senza dubbio un buon software con i suoi pregi e le sue lacune. Per prima cosa esso si pone in contrasto con gli altri analizzatori di server web prediligendo la vista microscopica a quella macroscopica. Esso introduce una nuova tecnica di analisi a cartelle che nessun analizzatore aveva fino ad ora, molto utile per generalizzare le visite. Propone in tutto tre grafici con diversi livelli di generalizzazione: il primo è tree che non generalizza nulla, per ogni utente mostra esattamente tutte le pagine, senza ridurle a cartelle, che ha visitato. Il secondo grafico è flow nel quale si può vedere la cronologia di tutti gli utenti contemporaneamente a livello di cartella , quindi già con questo grafico si generalizzano le visite dell'utente a cartelle e non più a pagine. L'ultimo grafico è il più generico di tutti, esso tralascia completamente l'utente e si avvicina come standard agli altri analizzatori che si possono trovare online. Esso mostra l'andamento del numero di utenti che navigano una certa cartella durante un certo lasso di tempo.
+Log to History è senza dubbio un buon software con i suoi pregi e le sue lacune. Per prima cosa esso si pone in contrasto con gli altri analizzatori di server web prediligendo la vista microscopica a quella macroscopica. Esso introduce una nuova tecnica di analisi a cartelle che nessun analizzatore aveva fino ad ora, molto utile per generalizzare le visite. Propone in tutto tre grafici con diversi livelli di generalizzazione: il primo è tree che non generalizza nulla, per ogni utente mostra esattamente tutte le pagine, senza ridurle a cartelle, che ha visitato. Il secondo grafico è flow nel quale si può vedere la cronologia di tutti gli utenti contemporaneamente a livello di cartella, quindi già con questo grafico si generalizzano le visite dell'utente a cartelle e non più a pagine. L'ultimo grafico è il più generico di tutti, esso tralascia completamente l'utente e si avvicina come standard agli altri analizzatori che si possono trovare online. Esso mostra l'andamento del numero di utenti che navigano una certa cartella durante un certo lasso di tempo.
 Log to History ha ancora molti aspetti in cui migliorare, ma considerando che è stato sviluppato in 3 mesi si può dire che ha già raggiunto un buon livello di complessità e praticità.
