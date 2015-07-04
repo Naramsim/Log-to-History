@@ -34,6 +34,8 @@ Indice:
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+
+
 ## Introduzione
 
 Log to history è uno strumento che permette di analizzare le visite di un determinato sito. È stato scritto con l'aiuto di Norbert Paissan durante un periodo di tesi/tirocinio di 3 mesi.
