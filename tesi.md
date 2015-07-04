@@ -38,7 +38,7 @@ Indice:
 
 ## Introduzione
 
-Log to history è uno strumento che permette di analizzare le visite di un determinato sito. È stato scritto con l'aiuto di Norbert Paissan durante un periodo di tesi/tirocinio di 3 mesi.
+Log to history è uno strumento che permette di analizzare le visite di un determinato sito. È stato sviluppato con l'aiuto di Norbert Paissan durante un periodo di tesi/tirocinio di 3 mesi.
 È un software installabile su tutti i server web ed è scritto con i linguaggi Python, PHP e Javascript, il suo codice è open source e si può estendere o consultare al seguente [link](https://github.com/Naramsim/Log-to-History). 
 Esso è composto da tre grafici che vengono costruiti andando ad analizzare un file, noto come access log, che registra tutte le visite da parte di utenti su un determinato sito web. Di questi grafici i primi due tendono a dare una vista microscopica, ovvero sono più efficaci per analizzare brevi periodi di tempo, mentre l'ultimo grafico è adattabile ad un qualsiasi periodo, sia di poche ore sia di più giorni. L'idea per la creazione di Log to History è venuta perché sul web mancano strumenti di analisi microscopica e di analisi del flusso di utenti. Lo scopo di Log to History, infatti, è riuscire ad analizzare come un utente naviga su un sito, ricostruendo la sua cronologia.
 Nella prima fase del progetto sono stati analizzati altri software open source che analizzano le visite a siti web, di seguito viene presentata una lista dei più diffusi con i relativi punti di forza e lacune.
