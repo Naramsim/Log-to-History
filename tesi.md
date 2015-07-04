@@ -151,18 +151,17 @@ Dopo la fase di preparazione avviene la vera e propria costruzione del file da p
 Il JSON che viene sviluppato per tree è di questa forma:
 
 ```
-{
- "name": "root",
- "children": [
+{ name: "root",
+ children: [
   {
-   "name": "IP1",
-   "children": [
+   name: "IP1",
+   children: [
     {
-     "name": "first_page_requested",
-     "children": [
-      {"name": "first_page_requested_coming_by parent"},
-      {"name": "second_page_requested_coming_by parent"},
-      {"name": "third_page_requested_coming_by parent"},
+     name: "first_page_requested",
+     children: [
+      {name: "first_page_requested_coming_by parent"},
+      {name: "second_page_requested_coming_by parent"},
+      {name: "third_page_requested_coming_by parent"},
      ]
     },
 ```
