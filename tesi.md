@@ -87,6 +87,7 @@ Sopra viene mostrato un esempio prolungato di uno stack chart, dalle tre di matt
 
 In questo esempio viene analizzato invece solo un breve periodo di un'ora, e viene usato il metodo _Expanded_ che mostra la percentuale di utenti per ogni cartella del sito. Si può vedere che nella prima mezz'ora gli utenti sono prevalentemente su _/atleta_, mentre nella seconda mezz'ora tendono a crescere le visite su _/confronto_ e sulla root del sito (_/_), ovvero la home-page.
 
+<br>
 ## Sviluppo
 
 ### Fase iniziale
