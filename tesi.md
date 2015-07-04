@@ -2,7 +2,6 @@
 Uno strumento di analisi rivolto al web. 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 Indice:
 - [Introduzione](#introduzione)
   - [Altri analizzatori open source](#altri-analizzatori-open-source)
