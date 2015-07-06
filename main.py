@@ -309,8 +309,10 @@ def get_requests():
             access_log_file.seek(first_seek_jump, os.SEEK_SET) #jump over unuseful lines
             access_log_file.readline() #read a chunked line 
             cursor_time = apachetime( find(log_pat, access_log_file.readline(), None)[0] )
-            #if cursor_time > start_point: #jumped too much
-                #bring back
+            while cursor_time > start_point: #jumped too much
+                access_log_file.seek(-32768 , os.SEEK_CUR)
+                access_log_file.readline() #read a chunked line 
+                cursor_time = apachetime( find(log_pat, access_log_file.readline(), None)[0] )
         requests = []
         for line in access_log_file:
             compiled_line = find(pat, line, None)
