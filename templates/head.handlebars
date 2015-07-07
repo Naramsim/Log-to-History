@@ -1,65 +1,68 @@
  <div id="header">
-        	<a id="logo" href="index.php">
-                <img src="https://cdn0.iconfinder.com/data/icons/typicons-2/24/flow-switch-128.png">
-            </a>
-            <div id="search"></div>
-            <div id="graphic-title-and-subtitle">
-                <div id="graphic-title">{{title}}</div>
-                <div id="graphic-subtitle">{{sub}}</div>
-                
-				  <div id="datetimepickerStart" class="input-append date">
-				    <input data-format="dd/MM/yyyy@hh:mm:ss" type="text" id="start_date" placeholder="start"></input>
-				    <span class="add-on">
-				      <i data-time-icon="icon-time" data-date-icon="icon-calendar">
-				      </i>
-				    </span>
-				  </div>
-				  <div id="datetimepickerEnd" class="input-append date">
-				    <input data-format="dd/MM/yyyy@hh:mm:ss" type="text" id="end_date" placeholder="end"></input>
-				    <span class="add-on">
-				      <i data-time-icon="icon-time" data-date-icon="icon-calendar">
-				      </i>
-				    </span>
-				  </div>
-				
-				<script type="text/javascript">
-				  $(function() {
-				    $('#datetimepickerStart, #datetimepickerEnd').datetimepicker({
-				    	format: 'dd/MM/yyyy@hh:mm:ss'
-				    	//language: 'pt-BR'
-				    });
-				  });
-				</script>
-				<button id="submit" type="button" class="btn btn-default btn-sm">Send</button>
-				<div id="explanation">Waiting for user input</div>
-                <div id="loader"></div>
-				<script type="text/javascript">
-			        $('#submit').on("click",function() { 
-			        	var date_regex = /^([123]0|[012][1-9]|31)\/(0[1-9]|1[012])\/(19[0-9]{2}|2[0-9]{3})@([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/ ;
-						var to_submit_s = $("#start_date").val();
-						var to_submit_e = $("#end_date").val();
-			        	if( (date_regex.test(to_submit_s)) && (date_regex.test(to_submit_e)) ){
-			        		start_spinner();
-			        		$.ajax({
-								url: "{{post_page}}",
-								type: 'POST',
-								data: { 'start_date': to_submit_s,
-										'end_date': to_submit_e,
-										'name': string_name, //defined in header.js
-										'graph': "{{post_page}}" },
-								success: function (data) {
-									  console.log(data);
-									  if ( data.indexOf("fail") < 0 ){
-										mid_spinner();
-									  	{{chart}}
-									  }else{
-									  	end_spinner();
-									  	alert("please, decrement time interval");
-									  }
-									}
-							});
-			        	}	
-		        	});
-		        </script>
-            </div>
-        </div>
+	<a id="logo" href="index.php">
+        <img src="https://cdn0.iconfinder.com/data/icons/typicons-2/24/flow-switch-128.png">
+    </a>
+    <div id="search"></div>
+    <div id="graphic-title-and-subtitle">
+        <div id="graphic-title">{{title}}</div>
+        <div id="graphic-subtitle">{{sub}}</div>
+        
+		  <div id="datetimepickerStart" class="input-append date">
+		    <input data-format="dd/MM/yyyy@hh:mm:ss" type="text" id="start_date" placeholder="start"></input>
+		    <span class="add-on">
+		      <i data-time-icon="icon-time" data-date-icon="icon-calendar">
+		      </i>
+		    </span>
+		  </div>
+		  <div id="datetimepickerEnd" class="input-append date">
+		    <input data-format="dd/MM/yyyy@hh:mm:ss" type="text" id="end_date" placeholder="end"></input>
+		    <span class="add-on">
+		      <i data-time-icon="icon-time" data-date-icon="icon-calendar">
+		      </i>
+		    </span>
+		  </div>
+		
+		<script type="text/javascript">
+		  $(function() {
+		    $('#datetimepickerStart, #datetimepickerEnd').datetimepicker({
+		    	format: 'dd/MM/yyyy@hh:mm:ss'
+		    	//language: 'pt-BR'
+		    });
+		  });
+		</script>
+		<button id="submit" type="button" class="btn btn-default btn-sm">Send</button>
+		<div id="explanation">Waiting for user input</div>
+        <div id="loader"></div>
+		<script type="text/javascript">
+	        $('#submit').on("click",function() { 
+	        	var date_regex = /^([123]0|[012][1-9]|31)\/(0[1-9]|1[012])\/(19[0-9]{2}|2[0-9]{3})@([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/ ;
+				var to_submit_s = $("#start_date").val();
+				var to_submit_e = $("#end_date").val();
+	        	if( (date_regex.test(to_submit_s)) && (date_regex.test(to_submit_e)) ){
+	        		start_spinner();
+	        		$.ajax({
+						url: "{{post_page}}",
+						type: 'POST',
+						data: { 'start_date': to_submit_s,
+								'end_date': to_submit_e,
+								'name': string_name, //defined in header.js
+								'graph': "{{post_page}}" },
+						success: function (data) {
+							  console.log(data);
+							  if ( data.indexOf("fail") < 0 ){
+								mid_spinner();
+							  	{{chart}}
+							  }else{
+							  	end_spinner();
+							  	alert("please, decrement time interval");
+							  }
+							}
+					});
+	        	}	
+        	});
+        </script>
+    </div>
+    <a href="https://github.com/Naramsim/Log-to-History">
+    	<img style="position: absolute; top: -7; right: 0; border: 0; height: 127%; transform: rotate(-4deg);" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
+    </a>
+</div>
