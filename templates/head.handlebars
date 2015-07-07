@@ -44,7 +44,9 @@
 								url: "{{post_page}}",
 								type: 'POST',
 								data: { 'start_date': to_submit_s,
-										'end_date': to_submit_e}, // An object with the key 'submit' and value 'true;
+										'end_date': to_submit_e,
+										'name': string_name, //defined in header.js
+										'graph': "{{post_page}}" },
 								success: function (data) {
 									  console.log(data);
 									  if ( data.indexOf("fail") < 0 ){

@@ -1,14 +1,5 @@
 <?php 
-	if( isset($_POST['start_date']) && isset($_POST['end_date']) ){
-		//print $_POST['start_date']." ".$_POST['end_date'];
-		$command = "./main.py ".$_POST['start_date']." ".$_POST['end_date']." 1";
-		//print $command;
-		ob_start();
-		system($command, $status);
-		$output = ob_get_clean();
-		print $output;
-		die();
-	}
+	require("php/post_to_python.php");
 ?>
 <html>
 <!--

@@ -52,7 +52,7 @@ function prepare_flow_chart(){
         return false;
     }
 
-    d3.json("data/flow.json", function(e, data) {
+    d3.json("data/f"+string_name+".json", function(e, data) {
     /*
     Main call that load TSV data
     Firstly it manipulates the data to fit the NY times algorithm

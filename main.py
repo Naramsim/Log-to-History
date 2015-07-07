@@ -25,12 +25,14 @@ with open('config.json') as data_file: #loads configuration
     config = json.load(data_file)
 
 to_render = -1
+graph_name = "data"
 if len(sys.argv) > 1:
     start_point = datetime.datetime.strptime(sys.argv[1], '%d/%m/%Y@%H:%M:%S')
     #start_point_ = time.strptime(sys.argv[1], '%d/%m/%Y@%H:%M:%S')
     end_point = datetime.datetime.strptime(sys.argv[2], '%d/%m/%Y@%H:%M:%S')
     #end_point_ = time.strptime(sys.argv[2], '%d/%m/%Y@%H:%M:%S')
     to_render = sys.argv[3]
+    graph_name = sys.argv[4]
 else: # default: 1 hour ago
     import datetime #TODO make datetime from time struct
     start_point = datetime.datetime.now().timetuple()
@@ -183,7 +185,7 @@ def get_user_story():
         if to_render == 0:
             #CREATES JSON for Tree Graph
             JSON_to_write = json.dumps( story, sort_keys=False)
-            file_ = open('data/tree.json', 'w')
+            file_ = open('data/t'+graph_name+'.json', 'w')
             file_.write(JSON_to_write)
             file_.close()
         if to_render == 1:
@@ -192,7 +194,7 @@ def get_user_story():
             flow_json["start_time"] = int(first_request_time.strftime("%s")) * 1000
             flow_json["data"] = json_list
             JSON_to_write = json.dumps( flow_json, sort_keys=False)
-            file_ = open('data/flow.json', 'w')
+            file_ = open('data/f'+graph_name+'.json', 'w')
             file_.write(JSON_to_write)
             file_.close()
         if to_render == 2:
@@ -202,7 +204,7 @@ def get_user_story():
             stack_json["interval_processed"] = int( hours[-1] ) #number of seconds that the script has processed (start - end)
             stack_json["data"] = json_list 
             JSON_to_write = json.dumps( stack_json, sort_keys=False)
-            file_ = open('data/stack.json', 'w')
+            file_ = open('data/s'+graph_name+'.json', 'w')
             file_.write(JSON_to_write)
             file_.close()
 

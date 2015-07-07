@@ -52,7 +52,7 @@ function prepare_stack(){
       return times_array;
   }
 
-  d3.json("data/stack.json" , function(data) {
+  d3.json("data/s"+string_name+".json" , function(data) {
   	//console.log(data)
     var pages = new Set(); //store all folder requested by all visitors 
     data["data"].forEach(function(entry) {            

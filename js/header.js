@@ -24,6 +24,16 @@ function check_dates() {
 	}
 }
 
+function makeid(){
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for( var i=0; i < 5; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+}
+
+var string_name = makeid();
+
 $(document).ready(function(){
 	if(typeof moment !== 'undefined') {
 		setInterval(function() { check_dates(); }, 700); //must use a timer check because all input events are overridden by datetime-picker library

@@ -6,7 +6,7 @@ We have adapted the code to fit our data and added tooltips on node hover
 
 function prepare_graph(){
     $("#graph").empty();
-    treeJSON = d3.json("data/tree.json", function(error, treeData) {
+    treeJSON = d3.json("data/t"+string_name+".json", function(error, treeData) {
 
         // Calculate total nodes, max label length
         var totalNodes = 0;
@@ -174,7 +174,7 @@ function prepare_graph(){
 
 
         // Define the drag listeners for drag/drop behaviour of nodes.
-        /*dragListener = d3.behavior.drag()
+        dragListener = d3.behavior.drag()
             .on("dragstart", function(d) {
                 if (d == root) {
                     return;
@@ -263,7 +263,7 @@ function prepare_graph(){
                 centerNode(draggingNode);
                 draggingNode = null;
             }
-        }*/
+        }
 
         // Helper functions for collapsing and expanding nodes.
 

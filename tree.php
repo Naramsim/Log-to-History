@@ -1,14 +1,5 @@
 <?php 
-	if( isset($_POST['start_date']) && isset($_POST['end_date']) ){
-		//print $_POST['start_date']." ".$_POST['end_date'];
-		$command = "./main.py ".$_POST['start_date']." ".$_POST['end_date']." 0";	
-		print $command;
-		ob_start();
-		system($command, $status);
-		$output1 = json_decode( ob_get_clean() , true);
-		$json_string = json_encode($output1, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-		die();
-	}
+	require("php/post_to_python.php");
 ?>
 <html>
 <!--
