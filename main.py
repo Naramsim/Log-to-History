@@ -180,7 +180,7 @@ def get_user_story():
     
         if not os.path.exists("data"):
             os.makedirs("data")
-            #os.chmod("data", 777)
+            os.chmod("data", 777)
 
         if to_render == 0:
             #CREATES JSON for Tree Graph

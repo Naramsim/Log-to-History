@@ -169,7 +169,7 @@ function prepare_flow_chart(){
         }), p = d3.select("#graphic").append("svg").attr("overflow","visible").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")");
         /* draw horizontal lines */p.append("defs").append("marker").attr("id", "arrowhead").attr("viewBox", "-.1 -5 10 10").attr("orient", "auto").attr("markerWidth", 3).attr("markerHeight", 3).append("path").attr("d", "M-.1,-4L3.9,0L-.1,4"), p.append("g").attr("class", "axis axis--minor").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(l).orient("right").tickSize(-s).ticks(d3.time.year)).selectAll(".tick").attr("class", function(e) {
             return "tick tick--" + (1984 === e.getFullYear() ? 1984 : e.getFullYear() % 10 ? "minor" : "major") //in 1984 draws a marker
-        }), p.append("g").attr("class", "axis axis--major").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(x_domain).orient("right").tickFormat(formatMinutes).tickValues(d3.range(0, 3600, 100))), p.append("g").attr("class", "axis axis--major").call(d3.svg.axis().scale(l).orient("left").tickValues(l.ticks(d3.time.year, 50).concat(l.domain())));
+        }), p.append("g").attr("class", "axis axis--major").attr("transform", "translate(" + s + ",0)").call(d3.svg.axis().scale(x_domain).orient("right").tickFormat(formatMinutes).tickValues(d3.range(0, 7200, 40))), p.append("g").attr("class", "axis axis--major").call(d3.svg.axis().scale(l).orient("left").tickValues(l.ticks(d3.time.year, 50).concat(l.domain())));
         var u = d3.select("#overlay").append("svg").attr("height", i + margins.left + margins.right).attr("width", s + margins.top + margins.bottom).append("g").attr("transform", "translate(" + margins.top + "," + margins.left + ")"), h = d3.select("#graphic-subtitle").append("svg").style("position", "absolute").style("margin-top", "-5px").attr("height", 30).attr("width", 30), f = h.append("g").attr("class", "school school--switch"), y = f.append("linearGradient").attr("id", "school-switch-gradient-key").attr("y1", "100%").attr("y2", "0%").attr("x1", 0).attr("x2", 0);
         y.append("stop").attr("offset", "0%").attr("stop-color", "#d7d7d7"), y.append("stop").attr("offset", "100%").attr("stop-color", "#d7d7d7"), f.append("path").attr("d", "M" + e(1)([[10, 22], [20, 8]])).style("stroke", "url(#school-switch-gradient-key)"), /* TODO delete gradient if not needed*/
         !function(t) {
@@ -178,7 +178,8 @@ function prepare_flow_chart(){
                 if (e) {
                     f(e.school.name);
                     var t = c(e.y), a = t > 860;
-                    B.style("display", null).attr("transform", "translate(" + (a ? t - 2 : t + 2) + "," + Math.round(l(e.date)) + ")rotate(0)").interrupt().transition().ease("elastic").attr("transform", "translate(" + (a ? t - 2 : t + 2) + "," + Math.round(l(e.date)) + ")rotate(" + (a ? 15 : -15) + ")"), M.style("text-anchor", a ? "end" : "start").attr("x", a ? -10 : 10).text(e.school.name).style("font-weight", "700").append("tspan").style("font-weight", "500").text(" " + e.school.team);
+                    console.log(e)
+                    B.style("display", null).attr("transform", "translate(" + (a ? t - 2 : t + 2) + "," + Math.round(l(e.date)) + ")rotate(0)").interrupt().transition().ease("elastic").attr("transform", "translate(" + (a ? t - 2 : t + 2) + "," + Math.round(l(e.date)) + ")rotate(" + (a ? 15 : -15) + ")"), M.style("text-anchor", a ? "end" : "start").attr("x", a ? -10 : 10).text(e.school.name).style("font-weight", "700").append("tspan").style("font-weight", "500").text(" " + formatMinutes(e.year) );
                     var n = M.node().getComputedTextLength() + 5;
                     j.attr("d", a ? "M0,0l-10,-10h" + -n + "v20h" + n + "z" : "M0,0l10,-10h" + n + "v20h-" + n + "z")
                 } else
@@ -203,7 +204,7 @@ function prepare_flow_chart(){
                 var scrollable = d3.select("body"); 
                 console.log(AA[0][AA[0].length -1]["__data__"][0]["year"])
 			    var scrollheight = 600 //scrollable.property("scrollHeight"); 
-			    scrollable.transition().duration(3000).tween("scroll", scrollTopTween(scrollheight))
+			    //scrollable.transition().duration(3000).tween("scroll", scrollTopTween(scrollheight))
 				
 				function scrollTopTween(scrollTop) { 
 				    return function() { 
@@ -366,7 +367,7 @@ function prepare_flow_chart(){
             })/*, p.append("line").attr("class", "annotation-line").attr("x1", 865).attr("y1", 25).attr("x2", 890).attr("y2", 25), p.append("line").attr("class", "annotation-line").attr("x1", 855).attr("y1", 428).attr("x2", 975).attr("y2", 428), p.append("line").attr("class", "annotation-line").attr("x1", 185).attr("y1", 1320).attr("x2", 185).attr("y2", 1370);*/
             
             var B = u.append("g").attr("class", "tooltip").style("display", "none"), j = B.append("path"), M = B.append("text").attr("dy", ".35em").attr("x", 10);
-            /*u.append("g").attr("class", "voronoi").selectAll("path").data(d3.geom.voronoi().y(function(e) {
+            u.append("g").attr("class", "voronoi").selectAll("path").data(d3.geom.voronoi().y(function(e) {
                 return l(e.date)
             }).x(function(e) {
                 return c(e.y)
@@ -383,7 +384,7 @@ function prepare_flow_chart(){
                 f(null), y(e.point.school.name), d3.event.stopPropagation()
             }), d3.select(window).on("click", function() {
                 y(null)
-            });*/
+            });
             end_spinner();
         }(data);
     }
