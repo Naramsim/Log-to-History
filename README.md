@@ -6,6 +6,11 @@ There are three representation, one tree graph ,one flow graph and a stacked cha
 
 Accept default Nginx access logs, Apache combined logs
 
-### Wiki
+### Setup
+
 For installation, requirements and informations, see:
 [Wiki](https://github.com/Naramsim/Log-to-Histroy/wiki "Wiki's Homepage")
+
+### Docs
+
+The [documentation](https://github.com/Naramsim/Log-to-History/blob/master/tesi.md) consists in just my thesis for my BSc, sorry but this is written in Italian.
